@@ -77,7 +77,7 @@ const ExperienceCard = ({ exp, index, isExpanded, onToggle }: {
       >
         <motion.div
           onClick={onToggle}
-          className="magnetic glass-card rounded-2xl p-6 cursor-pointer transition-all duration-300 hover:scale-[1.02]"
+          className="magnetic glass-card rounded-2xl p-6 cursor-pointer transition-all duration-300 hover:scale-[1.01] border border-white/[0.06]"
           whileHover={{ y: -5 }}
         >
           {/* Header */}

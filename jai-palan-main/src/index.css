@@ -2,58 +2,57 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-/* Premium Dark Portfolio Design System */
+/* Apple-inspired liquid glass design system — clean, polished, minimal */
 
 @layer base {
   :root {
-    --background: 222 47% 4%;
-    --foreground: 210 40% 98%;
+    --background: 220 20% 6%;
+    --foreground: 220 15% 96%;
 
-    --card: 222 47% 6%;
-    --card-foreground: 210 40% 98%;
+    --card: 220 18% 9%;
+    --card-foreground: 220 15% 96%;
 
-    --popover: 222 47% 6%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 220 18% 9%;
+    --popover-foreground: 220 15% 96%;
 
     --primary: 199 89% 48%;
-    --primary-foreground: 222 47% 4%;
+    --primary-foreground: 220 20% 6%;
 
-    --secondary: 263 70% 50%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 263 55% 55%;
+    --secondary-foreground: 220 15% 96%;
 
-    --muted: 217 33% 12%;
-    --muted-foreground: 215 20% 55%;
+    --muted: 220 18% 14%;
+    --muted-foreground: 220 12% 58%;
 
-    --accent: 263 70% 50%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 263 55% 55%;
+    --accent-foreground: 220 15% 96%;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 220 15% 96%;
 
-    --border: 217 33% 15%;
-    --input: 217 33% 15%;
+    --border: 220 15% 18% / 0.6;
+    --input: 220 15% 18% / 0.6;
     --ring: 199 89% 48%;
 
-    --radius: 0.75rem;
+    --radius: 1rem;
 
-    /* Custom gradient variables */
-    --gradient-primary: linear-gradient(135deg, hsl(199 89% 48%) 0%, hsl(263 70% 50%) 100%);
-    --gradient-glow: linear-gradient(135deg, hsl(199 89% 48% / 0.3) 0%, hsl(263 70% 50% / 0.3) 100%);
-    --gradient-text: linear-gradient(135deg, hsl(199 89% 60%) 0%, hsl(263 70% 65%) 50%, hsl(199 89% 60%) 100%);
-    --gradient-glass: linear-gradient(135deg, hsl(217 33% 12% / 0.6) 0%, hsl(217 33% 8% / 0.4) 100%);
+    /* Liquid glass gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(199 89% 48%) 0%, hsl(263 55% 55%) 100%);
+    --gradient-glow: linear-gradient(135deg, hsl(199 89% 48% / 0.2) 0%, hsl(263 55% 55% / 0.2) 100%);
+    --gradient-text: linear-gradient(135deg, hsl(199 89% 58%) 0%, hsl(263 55% 65%) 50%, hsl(199 89% 58%) 100%);
     
-    /* Glass effect variables */
-    --glass-bg: hsl(217 33% 10% / 0.5);
-    --glass-border: hsl(217 33% 20% / 0.5);
-    --glass-highlight: hsl(199 89% 48% / 0.1);
+    /* Liquid glass — frosted, translucent */
+    --glass-bg: hsl(220 18% 12% / 0.4);
+    --glass-border: hsl(220 20% 100% / 0.08);
+    --glass-highlight: hsl(220 20% 100% / 0.04);
 
-    /* Shadows */
-    --shadow-glow: 0 0 60px hsl(199 89% 48% / 0.15);
-    --shadow-card: 0 25px 50px -12px hsl(222 47% 2% / 0.5);
+    /* Soft, diffuse shadows */
+    --shadow-glow: 0 0 80px hsl(199 89% 48% / 0.08);
+    --shadow-card: 0 8px 32px -8px hsl(0 0% 0% / 0.35), 0 0 0 1px hsl(220 20% 100% / 0.03);
 
-    --sidebar-background: 222 47% 4%;
+    --sidebar-background: 220 20% 6%;
     --sidebar-foreground: 210 40% 98%;
     --sidebar-primary: 199 89% 48%;
     --sidebar-primary-foreground: 222 47% 4%;
@@ -80,7 +79,9 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Display', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   ::selection {
@@ -100,20 +101,21 @@
     animation: gradient-shift 4s ease-in-out infinite;
   }
 
-  /* Glass card effect */
+  /* Liquid glass card — frosted, soft edge */
   .glass-card {
     background: var(--glass-bg);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(40px) saturate(1.2);
+    -webkit-backdrop-filter: blur(40px) saturate(1.2);
     border: 1px solid var(--glass-border);
     box-shadow: var(--shadow-card);
+    border-radius: var(--radius);
   }
 
-  /* Animated border gradient */
+  /* Animated border gradient — subtle liquid edge */
   .animated-border {
     position: relative;
     background: var(--glass-bg);
-    backdrop-filter: blur(20px);
+    backdrop-filter: blur(40px) saturate(1.2);
   }
 
   .animated-border::before {
@@ -122,13 +124,13 @@
     inset: 0;
     padding: 1px;
     border-radius: inherit;
-    background: var(--gradient-primary);
+    background: linear-gradient(135deg, hsl(199 89% 48% / 0.4), hsl(263 55% 55% / 0.3));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
-    opacity: 0.5;
-    transition: opacity 0.3s ease;
+    opacity: 0.6;
+    transition: opacity 0.25s ease;
   }
 
   .animated-border:hover::before {
@@ -140,31 +142,35 @@
     box-shadow: var(--shadow-glow);
   }
 
-  /* Button primary gradient */
+  /* Button primary — clean, polished */
   .btn-primary {
     background: var(--gradient-primary);
     color: hsl(var(--primary-foreground));
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px hsl(199 89% 48% / 0.3);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 12px hsl(199 89% 48% / 0.25);
+    border-radius: var(--radius);
   }
 
   .btn-primary:hover {
-    box-shadow: 0 8px 30px hsl(199 89% 48% / 0.4);
-    transform: translateY(-2px);
+    box-shadow: 0 4px 20px hsl(199 89% 48% / 0.35);
+    transform: translateY(-1px);
   }
 
-  /* Button outline glass */
+  /* Button glass — liquid frosted */
   .btn-glass {
     background: var(--glass-bg);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(24px) saturate(1.2);
+    -webkit-backdrop-filter: blur(24px) saturate(1.2);
     border: 1px solid var(--glass-border);
     color: hsl(var(--foreground));
-    transition: all 0.3s ease;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: var(--radius);
   }
 
   .btn-glass:hover {
-    border-color: hsl(199 89% 48% / 0.5);
-    box-shadow: 0 0 20px hsl(199 89% 48% / 0.2);
+    border-color: hsl(220 20% 100% / 0.12);
+    background: hsl(220 18% 14% / 0.5);
+    box-shadow: 0 4px 24px hsl(0 0% 0% / 0.2);
   }
 
   /* Magnetic hover container */

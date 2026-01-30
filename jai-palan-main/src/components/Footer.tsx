@@ -14,8 +14,7 @@ const Footer = () => {
 
   return (
     <footer className="py-16 md:py-24 relative">
-      {/* Top border gradient */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+      <div className="absolute top-0 left-0 right-0 h-px bg-white/[0.06]" />
 
       <div className="container mx-auto px-6">
         <div className="flex flex-col items-center">
@@ -72,7 +71,7 @@ const Footer = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.3 }}
             onClick={scrollToTop}
-            className="magnetic p-3 rounded-full glass-card hover:border-primary/50 transition-all duration-300 mb-8 group"
+            className="magnetic p-3 rounded-full glass-card border border-white/[0.06] hover:border-white/[0.12] transition-all duration-300 mb-8 group"
             aria-label="Scroll to top"
           >
             <ArrowUp className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:-translate-y-0.5 transition-all" />

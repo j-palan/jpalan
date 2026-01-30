@@ -54,20 +54,17 @@ const HighlightCard = ({ highlight, index }: { highlight: typeof highlights[0]; 
       transition={{ duration: 0.6, delay: index * 0.1 }}
       className="group relative"
     >
-      {/* Card */}
-      <div className="relative h-full p-6 md:p-8 rounded-2xl glass-card animated-border overflow-hidden transition-all duration-500 hover:scale-[1.02]">
-        {/* Shimmer overlay */}
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+      {/* Card — liquid glass */}
+      <div className="relative h-full p-6 md:p-8 rounded-2xl glass-card animated-border overflow-hidden transition-all duration-300 hover:scale-[1.01] border border-white/[0.06]">
+        {/* Subtle hover highlight */}
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <div 
-            className="absolute inset-0"
+            className="absolute inset-0 rounded-2xl"
             style={{
-              background: `linear-gradient(135deg, transparent 0%, hsl(199 89% 48% / 0.05) 50%, transparent 100%)`,
+              background: `linear-gradient(135deg, transparent 0%, hsl(199 89% 48% / 0.03) 50%, transparent 100%)`,
             }}
           />
         </div>
-
-        {/* Glow effect on hover */}
-        <div className="absolute -inset-px rounded-2xl bg-gradient-to-r from-primary/20 to-secondary/20 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500" />
 
         {/* Content */}
         <div className="relative z-10">
@@ -87,8 +84,6 @@ const HighlightCard = ({ highlight, index }: { highlight: typeof highlights[0]; 
           </p>
         </div>
 
-        {/* Decorative corner */}
-        <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-primary/5 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       </div>
     </motion.div>
   );
@@ -100,9 +95,6 @@ const Highlights = () => {
 
   return (
     <section id="highlights" className="py-24 md:py-32 relative">
-      {/* Background accent */}
-      <div className="absolute inset-0 bg-gradient-to-b from-muted/20 via-transparent to-transparent" />
-
       <div className="container mx-auto px-6 relative">
         {/* Section header */}
         <motion.div

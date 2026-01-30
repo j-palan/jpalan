@@ -26,43 +26,40 @@ const FloatingShapes = () => {
   }, [mouseX, mouseY]);
 
   const shapes = [
-    // Large gradient sphere
+    // Soft gradient orbs — liquid glass ambient
     {
       size: 400,
       x: '70%',
       y: '20%',
-      gradient: 'radial-gradient(circle, hsl(199 89% 48% / 0.15) 0%, transparent 70%)',
-      blur: 60,
+      gradient: 'radial-gradient(circle, hsl(199 89% 48% / 0.08) 0%, transparent 70%)',
+      blur: 80,
       animationDelay: 0,
       parallaxFactor: 1.5,
     },
-    // Secondary sphere
     {
       size: 300,
       x: '20%',
       y: '60%',
-      gradient: 'radial-gradient(circle, hsl(263 70% 50% / 0.12) 0%, transparent 70%)',
-      blur: 50,
+      gradient: 'radial-gradient(circle, hsl(263 55% 55% / 0.06) 0%, transparent 70%)',
+      blur: 70,
       animationDelay: 2,
       parallaxFactor: 1,
     },
-    // Small accent
     {
       size: 200,
       x: '80%',
       y: '70%',
-      gradient: 'radial-gradient(circle, hsl(199 89% 48% / 0.1) 0%, transparent 70%)',
-      blur: 40,
+      gradient: 'radial-gradient(circle, hsl(199 89% 48% / 0.05) 0%, transparent 70%)',
+      blur: 50,
       animationDelay: 4,
       parallaxFactor: 2,
     },
-    // Top left accent
     {
       size: 150,
       x: '10%',
       y: '20%',
-      gradient: 'radial-gradient(circle, hsl(263 70% 50% / 0.08) 0%, transparent 70%)',
-      blur: 30,
+      gradient: 'radial-gradient(circle, hsl(263 55% 55% / 0.04) 0%, transparent 70%)',
+      blur: 40,
       animationDelay: 1,
       parallaxFactor: 0.5,
     },
@@ -97,90 +94,44 @@ const FloatingShapes = () => {
         />
       ))}
 
-      {/* Geometric shapes */}
+      {/* Subtle glass orbs — no geometric clutter */}
       <motion.div
-        className="absolute w-16 h-16 border border-primary/20 rounded-lg"
+        className="absolute w-20 h-20 rounded-2xl backdrop-blur-xl bg-white/[0.03] border border-white/[0.06]"
         style={{
-          left: '15%',
-          top: '30%',
+          left: '18%',
+          top: '28%',
           x: useTransform(mouseXSpring, (v) => v * 2),
           y: useTransform(mouseYSpring, (v) => v * 2),
         }}
         animate={{
-          rotate: [0, 90, 180, 270, 360],
-          scale: [1, 1.1, 1],
+          scale: [1, 1.05, 1],
+          opacity: [0.5, 0.8, 0.5],
         }}
         transition={{
-          duration: 20,
+          duration: 8,
           repeat: Infinity,
-          ease: 'linear',
+          ease: 'easeInOut',
         }}
       />
 
       <motion.div
-        className="absolute w-12 h-12 border border-secondary/20 rounded-full"
+        className="absolute w-14 h-14 rounded-full backdrop-blur-xl bg-white/[0.02] border border-white/[0.05]"
         style={{
-          right: '20%',
-          top: '40%',
+          right: '22%',
+          top: '38%',
           x: useTransform(mouseXSpring, (v) => -v * 1.5),
           y: useTransform(mouseYSpring, (v) => -v * 1.5),
         }}
         animate={{
-          scale: [1, 1.2, 1],
-          opacity: [0.3, 0.6, 0.3],
+          scale: [1, 1.08, 1],
+          opacity: [0.4, 0.7, 0.4],
         }}
         transition={{
-          duration: 5,
+          duration: 6,
           repeat: Infinity,
           ease: 'easeInOut',
         }}
       />
-
-      <motion.div
-        className="absolute w-8 h-8 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg"
-        style={{
-          left: '60%',
-          bottom: '30%',
-          x: useTransform(mouseXSpring, (v) => v * 3),
-          y: useTransform(mouseYSpring, (v) => v * 3),
-        }}
-        animate={{
-          rotate: [0, -45, 0, 45, 0],
-        }}
-        transition={{
-          duration: 10,
-          repeat: Infinity,
-          ease: 'easeInOut',
-        }}
-      />
-
-      {/* Dot grid pattern */}
-      <motion.div
-        className="absolute w-32 h-32"
-        style={{
-          left: '75%',
-          top: '15%',
-          x: useTransform(mouseXSpring, (v) => v * 0.5),
-          y: useTransform(mouseYSpring, (v) => v * 0.5),
-        }}
-      >
-        <div className="grid grid-cols-4 gap-4">
-          {Array.from({ length: 16 }).map((_, i) => (
-            <motion.div
-              key={i}
-              className="w-1.5 h-1.5 rounded-full bg-primary/20"
-              animate={{
-                opacity: [0.2, 0.5, 0.2],
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                delay: i * 0.1,
-              }}
-            />
-          ))}
-        </div>
-      </motion.div>
     </div>
   );
 };

@@ -38,18 +38,6 @@ const Hero = () => {
       {/* Floating shapes */}
       <FloatingShapes />
 
-      {/* Grid overlay */}
-      <div 
-        className="absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage: `
-            linear-gradient(hsl(var(--foreground)) 1px, transparent 1px),
-            linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)
-          `,
-          backgroundSize: '60px 60px',
-        }}
-      />
-
       {/* Content */}
       <motion.div
         className="relative z-10 container mx-auto px-6 text-center"
@@ -57,9 +45,9 @@ const Hero = () => {
         initial="hidden"
         animate="visible"
       >
-        {/* Badge */}
+        {/* Badge — liquid glass pill */}
         <motion.div variants={itemVariants} className="mb-8">
-          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card text-sm text-muted-foreground">
+          <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full glass-card text-sm text-muted-foreground border border-white/[0.06]">
             <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
             Open to opportunities
           </span>
@@ -88,7 +76,7 @@ const Hero = () => {
           <span className="text-foreground font-medium">high-performance products</span>.
         </motion.p>
 
-        {/* Tech stack pills */}
+        {/* Tech stack pills — clean glass */}
         <motion.div 
           variants={itemVariants}
           className="flex flex-wrap justify-center gap-3 mb-12"
@@ -96,7 +84,7 @@ const Hero = () => {
           {['Backend', 'AI/ML', 'Systems', 'Product'].map((tag) => (
             <span 
               key={tag}
-              className="px-4 py-1.5 rounded-full text-sm font-medium border border-border bg-muted/30 text-muted-foreground hover:border-primary/50 hover:text-foreground transition-all duration-300"
+              className="px-4 py-2 rounded-full text-sm font-medium glass-card text-muted-foreground hover:text-foreground border border-white/[0.06] transition-all duration-300"
             >
               {tag}
             </span>

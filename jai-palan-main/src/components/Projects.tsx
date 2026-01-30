@@ -39,12 +39,9 @@ const ProjectCard = ({ project, index }: { project: typeof projects[0]; index: n
       transition={{ duration: 0.8, delay: index * 0.2 }}
       className="group relative"
     >
-      <div className="relative rounded-3xl glass-card overflow-hidden transition-all duration-500 hover:scale-[1.02]">
-        {/* Gradient border animation */}
-        <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-primary/50 via-secondary/50 to-primary/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm" />
-        
+      <div className="relative rounded-2xl glass-card overflow-hidden transition-all duration-300 hover:scale-[1.01] border border-white/[0.06]">
         {/* Card content */}
-        <div className="relative m-[1px] rounded-3xl bg-card p-8 md:p-10">
+        <div className="relative rounded-2xl bg-card/80 p-8 md:p-10">
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 mb-8">
             <div>
@@ -109,9 +106,6 @@ const ProjectCard = ({ project, index }: { project: typeof projects[0]; index: n
             ))}
           </div>
 
-          {/* Decorative elements */}
-          <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-primary/5 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-secondary/5 to-transparent rounded-tr-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         </div>
       </div>
     </motion.div>
@@ -124,9 +118,6 @@ const Projects = () => {
 
   return (
     <section id="projects" className="py-24 md:py-32 relative">
-      {/* Background accent */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/10 to-transparent" />
-
       <div className="container mx-auto px-6 relative">
         {/* Section header */}
         <motion.div

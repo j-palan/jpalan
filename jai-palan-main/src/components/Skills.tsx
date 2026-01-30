@@ -71,7 +71,7 @@ const SkillPill = ({ skill, index, categoryIndex }: { skill: string; index: numb
             : '0 0 0px transparent',
         }}
         transition={{ duration: 0.2 }}
-        className="px-5 py-3 rounded-xl glass-card border border-border cursor-default"
+        className="px-5 py-3 rounded-xl glass-card border border-white/[0.06] cursor-default"
       >
         <span className={`font-medium transition-colors duration-200 ${isHovered ? 'text-primary' : 'text-foreground'}`}>
           {skill}
@@ -129,15 +129,6 @@ const Skills = () => {
 
   return (
     <section id="skills" className="py-24 md:py-32 relative overflow-hidden">
-      {/* Background pattern */}
-      <div 
-        className="absolute inset-0 opacity-[0.02]"
-        style={{
-          backgroundImage: `radial-gradient(hsl(var(--foreground)) 1px, transparent 1px)`,
-          backgroundSize: '40px 40px',
-        }}
-      />
-
       <div className="container mx-auto px-6 relative">
         {/* Section header */}
         <motion.div
