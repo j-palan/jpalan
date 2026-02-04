@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Hero / title font — Wealthsimple-style (add .woff2 to public/fonts/) */
+@font-face {
+  font-family: "Caslon Graphique";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/CaslonGraphique.woff2") format("woff2");
+}
+
 /* Apple-Inspired Liquid Glass Design System */
 
 @layer base {

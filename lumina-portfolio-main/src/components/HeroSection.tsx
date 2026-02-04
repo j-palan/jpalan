@@ -54,14 +54,14 @@ export const HeroSection = () => {
           </span>
         </motion.div>
 
-        {/* Name */}
+        {/* Name — Caslon Graphique (Wealthsimple font) */}
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="text-hero font-semibold tracking-tight leading-[1.1] mb-6"
+          className="font-caslon text-hero font-semibold tracking-tight leading-[1.1] mb-6"
         >
-          <span className="block">Hi, I'm</span>
+          <span className="block font-normal">Hey, I'm</span>
           <span className="block gradient-text-accent">Jai Palan</span>
         </motion.h1>
 
@@ -70,7 +70,7 @@ export const HeroSection = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-8 leading-relaxed text-balance"
+          className="font-caslon text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-8 leading-relaxed text-balance"
         >
           Software Engineer crafting performant systems and elegant interfaces.
           <br />

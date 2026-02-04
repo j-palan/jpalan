@@ -14,6 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
+        caslon: ['"Caslon Graphique"', "Georgia", "Cambria", "Times New Roman", "serif"],
         sans: [
           "SF Pro Display",
           "-apple-system",
