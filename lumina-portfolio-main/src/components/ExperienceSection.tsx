@@ -8,6 +8,12 @@ const companyLogos: Record<string, string> = {
   "Industry 4.0": "/i4logo.png",
 };
 
+const companyUrls: Record<string, string> = {
+  VITALL: "https://www.vitall.com/",
+  LTIMindtree: "https://www.ltimindtree.com/",
+  "Industry 4.0": "https://www.uwindustry4.ca/",
+};
+
 const experiences = [
   {
     title: "Software Engineer Intern",
@@ -73,7 +79,12 @@ export const ExperienceSection = () => {
                     {exp.title}
                     <ArrowUpRight className="w-4 h-4 text-accent opacity-0 group-hover:opacity-100 transition-opacity" />
                   </h3>
-                  <p className="text-accent font-medium flex items-center gap-2">
+                  <a
+                    href={companyUrls[exp.company]}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-accent font-medium flex items-center gap-2 hover:underline underline-offset-2 transition-all"
+                  >
                     {companyLogos[exp.company] && (
                       <img
                         src={companyLogos[exp.company]}
@@ -82,7 +93,7 @@ export const ExperienceSection = () => {
                       />
                     )}
                     {exp.company}
-                  </p>
+                  </a>
                 </div>
                 <div className="text-sm text-muted-foreground text-right">
                   <p>{exp.period}</p>

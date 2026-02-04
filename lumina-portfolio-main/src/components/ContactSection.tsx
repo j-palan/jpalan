@@ -11,15 +11,15 @@ const links = [
   },
   {
     label: "LinkedIn",
-    href: "https://linkedin.com/in/Jai",
+    href: "https://www.linkedin.com/in/jai-palan",
     icon: Linkedin,
-    value: "linkedin.com/in/Jai",
+    value: "linkedin.com/in/jai-palan",
   },
   {
     label: "GitHub",
-    href: "https://github.com",
+    href: "https://github.com/j-palan",
     icon: Github,
-    value: "github.com",
+    value: "github.com/j-palan",
   },
   {
     label: "Phone",

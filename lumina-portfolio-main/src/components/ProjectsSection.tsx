@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { GlassCard } from "./GlassCard";
 import { MagneticButton } from "./MagneticButton";
-import { ArrowUpRight, Trophy, Users } from "lucide-react";
+import { ArrowUpRight, Trophy, Users, Github, Play } from "lucide-react";
 
 const projects = [
   {
@@ -11,6 +11,8 @@ const projects = [
     award: "Won $5,000 at Hack the 6ix",
     tech: ["Ruby on Rails", "OpenAI API", "Next.js", "Prompt Engineering"],
     icon: Trophy,
+    demoUrl: "https://www.loom.com/share/3457d014a0d84388a72048c7a0eee908",
+    githubUrl: "https://github.com/j-palan/Rootly-Incident-Manager",
   },
   {
     title: "Runz",
@@ -19,6 +21,8 @@ const projects = [
     stats: "50+ active users",
     tech: ["React Native", "Expo", "Supabase", "Real-time"],
     icon: Users,
+    demoUrl: "https://drive.google.com/file/d/1sAkf7PRO2Ba7KHXL_TQkOKR11Z3xXUcF/view?usp=sharing",
+    githubUrl: "https://github.com/j-palan/Runz",
   },
 ];
 
@@ -46,11 +50,21 @@ export const ProjectsSection = () => {
                 <div className="w-12 h-12 rounded-2xl bg-accent/10 flex items-center justify-center">
                   <project.icon className="w-6 h-6 text-accent" />
                 </div>
-                <MagneticButton>
-                  <div className="w-10 h-10 rounded-full glass flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <ArrowUpRight className="w-4 h-4" />
-                  </div>
-                </MagneticButton>
+                <div className="flex items-center gap-2">
+                  <MagneticButton href={project.demoUrl}>
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full glass text-sm hover:bg-white/10 transition-colors">
+                      <Play className="w-3.5 h-3.5" />
+                      <span>Demo</span>
+                      <ArrowUpRight className="w-3 h-3" />
+                    </div>
+                  </MagneticButton>
+                  <MagneticButton href={project.githubUrl}>
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full glass text-sm hover:bg-white/10 transition-colors">
+                      <Github className="w-3.5 h-3.5" />
+                      <span>GitHub</span>
+                    </div>
+                  </MagneticButton>
+                </div>
               </div>
 
               <h3 className="text-xl font-semibold mb-2">{project.title}</h3>

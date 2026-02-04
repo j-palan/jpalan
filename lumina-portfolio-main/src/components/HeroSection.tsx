@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { Linkedin, Github, Mail } from "lucide-react";
+import { MagneticButton } from "./MagneticButton";
 
 /** Company link with logo, bold, hover underline */
 const CompanyLink = ({
@@ -88,15 +90,43 @@ export const HeroSection = () => {
         >
           <h1 className="font-caslon text-hero font-semibold tracking-tight leading-[1.1] mb-8">
             <span className="block font-normal text-muted-foreground">Hey, I'm</span>
-            <span className="block gradient-text-accent">Jai Palan</span>
+            <MagneticButton>
+              <span className="block gradient-text-accent cursor-default">Jai Palan</span>
+            </MagneticButton>
           </h1>
 
-          <Link
-            to="/work"
-            className="inline-block glass-button glow text-lg font-medium"
-          >
-            View My Work
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              to="/work"
+              className="inline-block glass-button glow text-lg font-medium"
+            >
+              View My Work
+            </Link>
+
+            {/* Social icons */}
+            <motion.div
+              initial={{ opacity: 0, x: 10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              className="flex items-center gap-2"
+            >
+              <MagneticButton href="https://www.linkedin.com/in/jai-palan">
+                <div className="w-10 h-10 rounded-full glass flex items-center justify-center hover:bg-white/10 transition-colors">
+                  <Linkedin className="w-5 h-5 text-muted-foreground hover:text-foreground transition-colors" />
+                </div>
+              </MagneticButton>
+              <MagneticButton href="https://github.com/j-palan">
+                <div className="w-10 h-10 rounded-full glass flex items-center justify-center hover:bg-white/10 transition-colors">
+                  <Github className="w-5 h-5 text-muted-foreground hover:text-foreground transition-colors" />
+                </div>
+              </MagneticButton>
+              <MagneticButton href="mailto:j2palan@uwaterloo.ca">
+                <div className="w-10 h-10 rounded-full glass flex items-center justify-center hover:bg-white/10 transition-colors">
+                  <Mail className="w-5 h-5 text-muted-foreground hover:text-foreground transition-colors" />
+                </div>
+              </MagneticButton>
+            </motion.div>
+          </div>
         </motion.div>
 
         {/* Right — Impact bullets + contact */}
