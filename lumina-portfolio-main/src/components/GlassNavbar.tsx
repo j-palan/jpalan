@@ -30,23 +30,26 @@ export const GlassNavbar = () => {
       <nav className="max-w-5xl mx-auto">
         <div className="glass rounded-full px-2 py-2 flex items-center justify-between">
           {/* Logo — link home */}
-          <Link to="/" className="px-4 py-2">
-            <span className="font-caslon text-lg font-semibold tracking-tight hover:text-accent transition-colors">
-              JP
-            </span>
-          </Link>
+          <MagneticButton>
+            <Link to="/" className="px-4 py-2 block">
+              <span className="font-caslon text-lg font-semibold tracking-tight hover:text-accent transition-colors">
+                JP
+              </span>
+            </Link>
+          </MagneticButton>
 
           {/* Nav Links */}
           <div className="hidden md:flex items-center gap-1">
             {navItems.map((item) => (
-              <Link
-                key={item.label}
-                to={item.href}
-                onClick={() => handleNavClick(item.href)}
-                className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors duration-200"
-              >
-                {item.label}
-              </Link>
+              <MagneticButton key={item.label}>
+                <Link
+                  to={item.href}
+                  onClick={() => handleNavClick(item.href)}
+                  className="px-4 py-2 block text-sm text-muted-foreground hover:text-foreground transition-colors duration-200"
+                >
+                  {item.label}
+                </Link>
+              </MagneticButton>
             ))}
           </div>
 

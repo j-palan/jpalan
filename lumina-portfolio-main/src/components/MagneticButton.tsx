@@ -35,28 +35,28 @@ export const MagneticButton = ({
   const content = (
     <motion.div
       ref={ref}
-      className={`magnetic inline-block ${className}`}
+      className={`magnetic inline-flex items-center ${className}`}
       onMouseMove={handleMouse}
       onMouseLeave={reset}
       animate={{ x: position.x, y: position.y }}
       transition={{ type: "spring", stiffness: 350, damping: 15 }}
     >
-      <motion.div
-        animate={{ x: position.x * 0.5, y: position.y * 0.5 }}
-        transition={{ type: "spring", stiffness: 350, damping: 15 }}
-      >
-        {children}
-      </motion.div>
+      {children}
     </motion.div>
   );
 
   if (href) {
     return (
-      <a href={href} target={target} rel={target === "_blank" ? "noopener noreferrer" : undefined}>
+      <a 
+        href={href} 
+        target={target} 
+        rel={target === "_blank" ? "noopener noreferrer" : undefined}
+        className="inline-block no-underline"
+      >
         {content}
       </a>
     );
   }
 
-  return <div onClick={onClick}>{content}</div>;
+  return <div onClick={onClick} className="inline-block">{content}</div>;
 };
