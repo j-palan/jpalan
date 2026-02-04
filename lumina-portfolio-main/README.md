@@ -2,14 +2,7 @@
 
 A single-page personal portfolio built with a modern, polished stack. Features a glass-morphism UI, smooth animations, and responsive layout.
 
-## Sections
 
-- **Hero** — Intro, headline, and primary CTA
-- **Skills** — Tech stack and competencies
-- **Experience** — Work history and impact
-- **Projects** — Featured work with links
-- **Contact** — Get in touch
-- **Footer** — Links and copyright
 
 ## Tech Stack
 
