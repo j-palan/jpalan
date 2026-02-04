@@ -31,7 +31,7 @@ export const SkillsSection = () => {
           className="mb-16"
         >
           <span className="section-title">Skills</span>
-          <h2 className="text-4xl md:text-5xl font-semibold tracking-tight">
+          <h2 className="font-caslon text-4xl md:text-5xl font-semibold tracking-tight">
             My <span className="gradient-text-accent">toolkit</span>
           </h2>
         </motion.div>

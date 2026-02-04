@@ -41,7 +41,7 @@ export const ContactSection = () => {
           className="mb-12"
         >
           <span className="section-title">Contact</span>
-          <h2 className="text-4xl md:text-5xl font-semibold tracking-tight mb-6">
+          <h2 className="font-caslon text-4xl md:text-5xl font-semibold tracking-tight mb-6">
             Let's <span className="gradient-text-accent">connect</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-lg mx-auto">

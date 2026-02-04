@@ -34,7 +34,7 @@ export const ProjectsSection = () => {
           className="mb-16"
         >
           <span className="section-title">Projects</span>
-          <h2 className="text-4xl md:text-5xl font-semibold tracking-tight">
+          <h2 className="font-caslon text-4xl md:text-5xl font-semibold tracking-tight">
             What I've <span className="gradient-text-accent">built</span>
           </h2>
         </motion.div>

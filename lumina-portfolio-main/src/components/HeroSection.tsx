@@ -172,7 +172,7 @@ export const HeroSection = () => {
             >
               <span className="mt-2 shrink-0 w-1.5 h-1.5 rounded-full bg-accent" aria-hidden />
               <span>
-                Motivated by companies building AI-native products, enterprise infrastructure, and financial systems, with a bias toward ownership, speed, and measurable impact.
+               I love building things that help people and make a difference. I want to see my work used by millions of people.
               </span>
             </motion.li>
           </ul>

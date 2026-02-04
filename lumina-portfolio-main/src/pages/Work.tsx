@@ -13,9 +13,9 @@ const Work = () => {
       <GlassNavbar />
 
       <main className="pt-24">
-        <SkillsSection />
         <ExperienceSection />
         <ProjectsSection />
+        <SkillsSection />
         <ContactSection />
       </main>
 

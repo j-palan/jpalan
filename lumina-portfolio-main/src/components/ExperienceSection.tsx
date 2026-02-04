@@ -2,6 +2,12 @@ import { motion } from "framer-motion";
 import { GlassCard } from "./GlassCard";
 import { ArrowUpRight } from "lucide-react";
 
+const companyLogos: Record<string, string> = {
+  VITALL: "/vitall.png",
+  LTIMindtree: "/LTI.png",
+  "Industry 4.0": "/i4logo.png",
+};
+
 const experiences = [
   {
     title: "Software Engineer Intern",
@@ -53,7 +59,7 @@ export const ExperienceSection = () => {
           className="mb-16"
         >
           <span className="section-title">Experience</span>
-          <h2 className="text-4xl md:text-5xl font-semibold tracking-tight">
+          <h2 className="font-caslon text-4xl md:text-5xl font-semibold tracking-tight">
             Where I've <span className="gradient-text-accent">contributed</span>
           </h2>
         </motion.div>
@@ -67,7 +73,16 @@ export const ExperienceSection = () => {
                     {exp.title}
                     <ArrowUpRight className="w-4 h-4 text-accent opacity-0 group-hover:opacity-100 transition-opacity" />
                   </h3>
-                  <p className="text-accent font-medium">{exp.company}</p>
+                  <p className="text-accent font-medium flex items-center gap-2">
+                    {companyLogos[exp.company] && (
+                      <img
+                        src={companyLogos[exp.company]}
+                        alt={exp.company}
+                        className="h-4 w-4 object-contain"
+                      />
+                    )}
+                    {exp.company}
+                  </p>
                 </div>
                 <div className="text-sm text-muted-foreground text-right">
                   <p>{exp.period}</p>
