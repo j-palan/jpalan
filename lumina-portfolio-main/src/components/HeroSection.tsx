@@ -88,12 +88,26 @@ export const HeroSection = () => {
           transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
           className="text-left"
         >
-          <h1 className="font-caslon text-hero font-semibold tracking-tight leading-[1.1] mb-8">
+          <h1 className="font-caslon text-hero font-semibold tracking-tight leading-[1.1] mb-4">
             <span className="block font-normal text-muted-foreground">Hey, I'm</span>
             <MagneticButton>
               <span className="block gradient-text-accent cursor-default">Jai Palan</span>
             </MagneticButton>
           </h1>
+          <a
+            href="https://uwaterloo.ca/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground hover:underline underline-offset-2 transition-colors mb-8"
+          >
+            <span className="text-lg">Nano-Science + CS @</span>
+            <img
+              src="/wloologo.png"
+              alt="University of Waterloo"
+              className="h-5 object-contain"
+            />
+            <span className="text-lg">uwaterloo</span>
+          </a>
 
           <div className="flex items-center gap-4">
             <Link

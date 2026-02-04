@@ -130,6 +130,16 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    cursor: none;
+  }
+
+  /* Hide native cursor on all interactive elements */
+  a, button, input, textarea, select, [role="button"], .magnetic, .glass-button, .btn-primary, .btn-glass {
+    cursor: none !important;
+  }
+
+  * {
+    cursor: none;
   }
 
   ::selection {

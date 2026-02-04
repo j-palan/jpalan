@@ -46,11 +46,15 @@ export const MagneticButton = ({
   );
 
   if (href) {
+    // Auto-detect external links and open in new tab
+    const isExternal = href.startsWith("http://") || href.startsWith("https://");
+    const linkTarget = target ?? (isExternal ? "_blank" : undefined);
+    
     return (
       <a 
         href={href} 
-        target={target} 
-        rel={target === "_blank" ? "noopener noreferrer" : undefined}
+        target={linkTarget} 
+        rel={linkTarget === "_blank" ? "noopener noreferrer" : undefined}
         className="inline-block no-underline"
       >
         {content}
