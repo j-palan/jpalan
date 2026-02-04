@@ -133,13 +133,18 @@
     cursor: none;
   }
 
-  /* Hide native cursor on all interactive elements */
-  a, button, input, textarea, select, [role="button"], .magnetic, .glass-button, .btn-primary, .btn-glass {
+  /* Hide native cursor globally */
+  *,
+  *::before,
+  *::after,
+  a, button, input, textarea, select, 
+  [role="button"], 
+  .magnetic, 
+  .glass-button, 
+  .btn-primary, 
+  .btn-glass,
+  [class*="cursor-"] {
     cursor: none !important;
-  }
-
-  * {
-    cursor: none;
   }
 
   ::selection {
@@ -182,7 +187,7 @@
 
   /* Glass Button */
   .glass-button {
-    @apply glass rounded-full px-6 py-3 font-medium transition-all cursor-pointer;
+    @apply glass rounded-full px-6 py-3 font-medium transition-all;
     transition-duration: var(--timing-normal);
     transition-timing-function: var(--ease-spring);
   }
@@ -301,6 +306,13 @@
 }
 
 @layer utilities {
+  /* Force hide cursor - override Tailwind cursor utilities */
+  .cursor-pointer,
+  .cursor-default,
+  .cursor-auto {
+    cursor: none !important;
+  }
+
   /* Animation utilities */
   .animate-fade-up {
     animation: fade-up var(--timing-slower) var(--ease-out-expo) forwards;
