@@ -1,10 +1,48 @@
 import { motion } from "framer-motion";
-import { MagneticButton } from "./MagneticButton";
-import { ArrowDown } from "lucide-react";
+import { Link } from "react-router-dom";
+
+/** Company link with logo, bold, hover underline */
+const CompanyLink = ({
+  href,
+  logo,
+  name,
+  logoClassName,
+}: {
+  href: string;
+  logo: string;
+  name: string;
+  logoClassName?: string;
+}) => (
+  <a
+    href={href}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="font-semibold text-foreground hover:underline underline-offset-2"
+  >
+    <img
+      src={logo}
+      alt={name}
+      className={`inline-block align-text-bottom object-contain mr-1.5 ${logoClassName ?? "h-4 w-4"}`}
+    />
+    <span className="align-baseline">{name}</span>
+  </a>
+);
+
+/** Bold metric */
+const Metric = ({ children }: { children: React.ReactNode }) => (
+  <span className="font-semibold text-foreground">{children}</span>
+);
+
+/** Money value with green glow */
+const Money = ({ children }: { children: React.ReactNode }) => (
+  <span className="font-semibold text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.6)]">
+    {children}
+  </span>
+);
 
 export const HeroSection = () => {
   return (
-    <section className="relative min-h-screen flex items-center justify-center px-6 overflow-hidden">
+    <section className="relative min-h-screen flex items-center px-6 overflow-hidden">
       {/* Ambient gradient background */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
@@ -39,81 +77,117 @@ export const HeroSection = () => {
         />
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 max-w-4xl mx-auto text-center">
-        {/* Greeting */}
+      {/* Content — two-column layout */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center py-24">
+        {/* Left — Name + CTA */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-6"
+          initial={{ opacity: 0, x: -40 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          className="text-left"
         >
-          <span className="inline-flex items-center gap-2 glass rounded-full px-4 py-2 text-sm text-muted-foreground">
-            <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-            Open to new opportunities
-          </span>
+          <h1 className="font-caslon text-hero font-semibold tracking-tight leading-[1.1] mb-8">
+            <span className="block font-normal text-muted-foreground">Hey, I'm</span>
+            <span className="block gradient-text-accent">Jai Palan</span>
+          </h1>
+
+          <Link
+            to="/work"
+            className="inline-block glass-button glow text-lg font-medium"
+          >
+            View My Work
+          </Link>
         </motion.div>
 
-        {/* Name — Caslon Graphique (Wealthsimple font) */}
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="font-caslon text-hero font-semibold tracking-tight leading-[1.1] mb-6"
-        >
-          <span className="block font-normal">Hey, I'm</span>
-          <span className="block gradient-text-accent">Jai Palan</span>
-        </motion.h1>
-
-        {/* Tagline */}
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className="font-caslon text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-8 leading-relaxed text-balance"
-        >
-          Software Engineer crafting performant systems and elegant interfaces.
-          <br />
-          <span className="text-foreground/80">Nano-science @ University of Waterloo</span>
-        </motion.p>
-
-        {/* CTAs */}
+        {/* Right — Impact bullets + contact */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.9, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4"
+          initial={{ opacity: 0, x: 40 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="text-left"
         >
-          <MagneticButton href="#experience">
-            <span className="glass-button glow inline-flex items-center gap-2">
-              View My Work
-              <ArrowDown className="w-4 h-4" />
-            </span>
-          </MagneticButton>
-          <MagneticButton href="mailto:j2palan@uwaterloo.ca">
-            <span className="text-muted-foreground hover:text-foreground transition-colors link-underline">
-              j2palan@uwaterloo.ca
-            </span>
-          </MagneticButton>
+          <h2 className="text-sm font-medium uppercase tracking-widest text-muted-foreground mb-6">
+            Proven Impact
+          </h2>
+
+          <ul className="space-y-4 mb-8">
+           
+
+            {/* Bullet 2 — VITALL */}
+            <motion.li
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              className="flex gap-3 text-sm md:text-base text-foreground/80 leading-relaxed"
+            >
+              <span className="mt-2 shrink-0 w-1.5 h-1.5 rounded-full bg-accent" aria-hidden />
+              <span>
+                Startup operator at{" "}
+                <CompanyLink href="https://www.vitall.com/" logo="/vitall.png" name="VITALL" />
+                , a fast-moving early-stage company, where I owned end-to-end features that cut manual workflows by <Metric>10×</Metric>, saved <Money>$150K+</Money> annually, and supported <Metric>13+</Metric> paying clients, directly contributing to <Money>$130K</Money> in revenue.
+              </span>
+            </motion.li>
+
+            {/* Bullet 3 — LTIMindtree */}
+            <motion.li
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="flex gap-3 text-sm md:text-base text-foreground/80 leading-relaxed"
+            >
+              <span className="mt-2 shrink-0 w-1.5 h-1.5 rounded-full bg-accent" aria-hidden />
+              <span>
+                Enterprise engineering experience at{" "}
+                <CompanyLink href="https://www.ltimindtree.com/" logo="/LTI.png" name="LTIMindtree" />
+                , working on production systems that process <Metric>100,000+</Metric> financial transactions weekly between Unitrax™ and <Metric>5+</Metric> major financial institutions.
+              </span>
+            </motion.li>
+
+            {/* Bullet 4 — Industry 4.0 */}
+            <motion.li
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.9, ease: [0.16, 1, 0.3, 1] }}
+              className="flex gap-3 text-sm md:text-base text-foreground/80 leading-relaxed"
+            >
+              <span className="mt-2 shrink-0 w-1.5 h-1.5 rounded-full bg-accent" aria-hidden />
+              <span>
+                Technical leader at{" "}
+                <CompanyLink
+                  href="https://www.uwindustry4.ca/"
+                  logo="/i4logo.png"
+                  name="Industry 4.0"
+                  logoClassName="h-5 w-5"
+                />
+                {" "}, where I built and scaled a platform to <Metric>220+</Metric> users, secured <Metric>3</Metric> sponsors, raised <Money>$2K+</Money>, and led competitions engaging <Metric>200+</Metric> participants.
+              </span>
+            </motion.li>
+
+            {/* Bullet 5 */}
+            <motion.li
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 1.0, ease: [0.16, 1, 0.3, 1] }}
+              className="flex gap-3 text-sm md:text-base text-foreground/80 leading-relaxed"
+            >
+              <span className="mt-2 shrink-0 w-1.5 h-1.5 rounded-full bg-accent" aria-hidden />
+              <span>
+                Motivated by companies building AI-native products, enterprise infrastructure, and financial systems, with a bias toward ownership, speed, and measurable impact.
+              </span>
+            </motion.li>
+          </ul>
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 1.2, ease: [0.16, 1, 0.3, 1] }}
+            className="text-sm text-muted-foreground"
+          >
+            You can reach out to me at{" "}
+            <span className="text-foreground">j2palan[at]uwaterloo[dot]ca</span>
+          </motion.p>
         </motion.div>
       </div>
-
-      {/* Scroll indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.5, duration: 1 }}
-        className="absolute bottom-12 left-1/2 -translate-x-1/2"
-      >
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          className="flex flex-col items-center gap-2 text-muted-foreground"
-        >
-          <span className="text-xs uppercase tracking-widest">Scroll</span>
-          <div className="w-px h-12 bg-gradient-to-b from-muted-foreground/50 to-transparent" />
-        </motion.div>
-      </motion.div>
     </section>
   );
 };

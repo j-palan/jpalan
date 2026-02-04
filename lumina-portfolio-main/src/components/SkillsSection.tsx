@@ -21,7 +21,7 @@ const skillCategories = [
 
 export const SkillsSection = () => {
   return (
-    <section id="about" className="section px-6 overflow-hidden">
+    <section id="skills" className="section px-6 overflow-hidden">
       <div className="max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

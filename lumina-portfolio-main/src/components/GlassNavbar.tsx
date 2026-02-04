@@ -1,14 +1,25 @@
 import { motion } from "framer-motion";
+import { Link, useLocation } from "react-router-dom";
 import { MagneticButton } from "./MagneticButton";
 
 const navItems = [
-  { label: "About", href: "#about" },
-  { label: "Experience", href: "#experience" },
-  { label: "Projects", href: "#projects" },
-  { label: "Contact", href: "#contact" },
+  { label: "Skills", href: "/work#skills" },
+  { label: "Experience", href: "/work#experience" },
+  { label: "Projects", href: "/work#projects" },
+  { label: "Contact", href: "/work#contact" },
 ];
 
 export const GlassNavbar = () => {
+  const location = useLocation();
+
+  const handleNavClick = (href: string) => {
+    // If already on /work, scroll to section; otherwise navigate
+    if (location.pathname === "/work" && href.startsWith("/work#")) {
+      const id = href.replace("/work#", "");
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <motion.header
       initial={{ opacity: 0, y: -20 }}
@@ -18,19 +29,22 @@ export const GlassNavbar = () => {
     >
       <nav className="max-w-5xl mx-auto">
         <div className="glass rounded-full px-2 py-2 flex items-center justify-between">
-          {/* Logo */}
-          <MagneticButton href="#" className="px-4 py-2">
-            <span className="text-lg font-semibold tracking-tight">JP</span>
-          </MagneticButton>
+          {/* Logo — link home */}
+          <Link to="/" className="px-4 py-2">
+            <span className="text-lg font-semibold tracking-tight hover:text-accent transition-colors">JP</span>
+          </Link>
 
           {/* Nav Links */}
           <div className="hidden md:flex items-center gap-1">
             {navItems.map((item) => (
-              <MagneticButton key={item.label} href={item.href}>
-                <span className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors duration-200">
-                  {item.label}
-                </span>
-              </MagneticButton>
+              <Link
+                key={item.label}
+                to={item.href}
+                onClick={() => handleNavClick(item.href)}
+                className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors duration-200"
+              >
+                {item.label}
+              </Link>
             ))}
           </div>
 
