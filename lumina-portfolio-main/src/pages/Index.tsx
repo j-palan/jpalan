@@ -76,7 +76,9 @@ const Page = () => {
         initial={prefersReduced ? false : { opacity: 0 }}
         animate={{ opacity: prefersReduced || revealed ? 1 : 0 }}
         transition={{ duration: prefersReduced ? 0 : 0.9, ease: EASE }}
-      />
+      >
+        <span className="page-grid-wave" />
+      </motion.div>
 
       <div className={revealed ? "relative z-10" : "pointer-events-none relative z-10"}>
         <header className="fixed inset-x-0 top-0 z-30 flex h-[var(--grid)] items-center justify-between px-6 sm:px-10">
@@ -104,6 +106,7 @@ const Page = () => {
               <ScrambleText
                 text={site.greeting}
                 trigger={headingTrigger}
+                hover
                 className="text-muted"
               />{" "}
               {/* Every character starts scrambled; `delay` pushes back when this
@@ -114,6 +117,7 @@ const Page = () => {
                 text={site.firstName}
                 trigger={headingTrigger}
                 delay={680}
+                hover
                 className="italic"
               />
             </motion.h1>

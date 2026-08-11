@@ -27,6 +27,7 @@ export const ScrambleText = ({
   trigger,
   delay = 0,
   className,
+  hover = false,
 }: {
   text: string;
   /** Increment to run the settle wave. */
@@ -34,6 +35,12 @@ export const ScrambleText = ({
   /** Offsets the wave, so a row can sweep across several spans in order. */
   delay?: number;
   className?: string;
+  /**
+   * Opt in to per-character hover. Off by default: it splits the text into a
+   * span per character permanently, which costs the browser's kerning, so only
+   * type big enough to be worth touching should carry it.
+   */
+  hover?: boolean;
 }) => {
   const prefersReduced = useReducedMotion();
   const characters = useMemo(() => Array.from(text), [text]);
@@ -110,11 +117,22 @@ export const ScrambleText = ({
     hoverUntil.current[index] = performance.now() + HOVER_TAIL;
   };
 
+  /* Nothing to hover and nothing running: one span, so the browser can kern. */
+  if (!hover && !cells) return <span className={className}>{text}</span>;
+
   return (
     <span className={className}>
       {characters.map((character, index) => {
         if (character === " ") return <span key={index}> </span>;
         const cell = cells?.[index] ?? null;
+
+        if (!hover) {
+          return (
+            <span key={index} style={cell ? { color: cell.color } : undefined}>
+              {cell ? cell.glyph : character}
+            </span>
+          );
+        }
 
         return (
           <span

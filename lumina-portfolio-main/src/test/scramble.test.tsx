@@ -32,7 +32,7 @@ const TEXT = "Hey Jai";
 
 describe("ScrambleText", () => {
   it("gives every non-space character its own hover target", () => {
-    const { container } = render(<ScrambleText text={TEXT} trigger={0} />);
+    const { container } = render(<ScrambleText text={TEXT} trigger={0} hover />);
     const targets = container.querySelectorAll("span.inline-block");
     expect(targets).toHaveLength(TEXT.replace(/ /g, "").length);
   });
@@ -45,7 +45,7 @@ describe("ScrambleText", () => {
   /* The overlay is decorative and the real character stays put underneath, so
      the heading never announces itself as a line of symbols. */
   it("keeps the real characters in the accessible tree mid-scramble", () => {
-    const { container } = render(<ScrambleText text={TEXT} trigger={1} />);
+    const { container } = render(<ScrambleText text={TEXT} trigger={1} hover />);
     advance(0);
     advance(60);
 
@@ -60,7 +60,7 @@ describe("ScrambleText", () => {
   /* A wide glyph in a narrow letter must not reflow the line, or the letter
      would shift out from under the pointer that is hovering it. */
   it("leaves the character in the box that sets the width", () => {
-    const { container } = render(<ScrambleText text={TEXT} trigger={1} />);
+    const { container } = render(<ScrambleText text={TEXT} trigger={1} hover />);
     advance(0);
     advance(60);
 
@@ -69,8 +69,16 @@ describe("ScrambleText", () => {
     expect(scrambling?.textContent).toHaveLength(1);
   });
 
+  /* Hover splits the text into a span per character permanently, which costs
+     kerning — so everywhere that did not ask for it stays one span. */
+  it("stays a single span, with no hover targets, unless asked", () => {
+    const { container } = render(<ScrambleText text={TEXT} trigger={0} />);
+    expect(container.querySelectorAll("span.inline-block")).toHaveLength(0);
+    expect(container.querySelectorAll("span")).toHaveLength(1);
+  });
+
   it("stops the frame loop once the wave has settled", () => {
-    render(<ScrambleText text={TEXT} trigger={1} />);
+    render(<ScrambleText text={TEXT} trigger={1} hover />);
     advance(0);
     advance(2000);
     advance(0);

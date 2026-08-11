@@ -168,6 +168,67 @@
     );
   }
 
+  /* A band of light that crosses the grid every few seconds, so the page has a
+     pulse without anything actually moving. Same pattern, size and origin as
+     .page-grid, so it lights the existing lines rather than drawing new ones —
+     and it sits inside .page-grid, whose mask already fades it top and bottom.
+
+     The mask is three viewports wide with the band in the middle third. At
+     mask-position 0% that middle third sits off the right edge and at 100% off
+     the left, so the sweep runs 100% -> 0% to travel left to right. */
+  .page-grid-wave {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, hsl(var(--gold-500) / 0.16) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--gold-500) / 0.16) 1px, transparent 1px);
+    background-size: var(--grid) var(--grid);
+    background-position: center var(--masthead);
+    -webkit-mask-image: linear-gradient(
+      100deg,
+      transparent 30%,
+      hsl(0 0% 0% / 0.3) 42%,
+      #000 50%,
+      hsl(0 0% 0% / 0.3) 58%,
+      transparent 70%
+    );
+    mask-image: linear-gradient(
+      100deg,
+      transparent 30%,
+      hsl(0 0% 0% / 0.3) 42%,
+      #000 50%,
+      hsl(0 0% 0% / 0.3) 58%,
+      transparent 70%
+    );
+    -webkit-mask-size: 300% 100%;
+    mask-size: 300% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    animation: grid-wave 6s ease-in-out infinite;
+  }
+
+  /* Crosses left to right over the first 40% of the cycle, then waits out the
+     rest off-screen. The hold is what keeps it a pulse rather than a
+     conveyor — roughly 2.4s crossing, 3.6s of stillness. */
+  @keyframes grid-wave {
+    0% {
+      -webkit-mask-position: 100% 0;
+      mask-position: 100% 0;
+    }
+    40%,
+    100% {
+      -webkit-mask-position: 0% 0;
+      mask-position: 0% 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .page-grid-wave {
+      animation: none;
+      opacity: 0;
+    }
+  }
+
   /* Quiet link: the rule grows from the left on hover. */
   .link {
     @apply relative text-foreground no-underline;
