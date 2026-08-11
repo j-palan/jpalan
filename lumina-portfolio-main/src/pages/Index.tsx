@@ -106,10 +106,14 @@ const Page = () => {
                 trigger={headingTrigger}
                 className="text-muted"
               />{" "}
+              {/* Every character starts scrambled; `delay` pushes back when this
+                  span settles. "Hey, I’m" resolves at ~500ms, so holding the
+                  name until ~1s leaves it churning alone for half a second and
+                  makes it the last thing to land. */}
               <ScrambleText
                 text={site.firstName}
                 trigger={headingTrigger}
-                delay={280}
+                delay={680}
                 className="italic"
               />
             </motion.h1>
