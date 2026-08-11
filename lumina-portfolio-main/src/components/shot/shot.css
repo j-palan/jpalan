@@ -1,0 +1,47 @@
+/* The round fired from the coin mark. Shares its look with the intro round;
+   only the layer and the trail length differ. */
+
+.shot-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+}
+
+/* Slower than the opening round, so the tracer is shortened to match. */
+.bullet-trail--short {
+  width: 230px;
+}
+
+/* Struck text jolts, then reloads. */
+@keyframes shot-shake {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  12% {
+    transform: translate3d(-3px, 1px, 0);
+  }
+  28% {
+    transform: translate3d(3px, -2px, 0);
+  }
+  44% {
+    transform: translate3d(-2px, 2px, 0);
+  }
+  62% {
+    transform: translate3d(2px, -1px, 0);
+  }
+  80% {
+    transform: translate3d(-1px, 1px, 0);
+  }
+}
+
+.shot-shake {
+  animation: shot-shake 380ms cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shot-shake {
+    animation: none;
+  }
+}

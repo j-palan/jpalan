@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <radialGradient id="face" cx="34%" cy="26%" r="82%">
+      <stop offset="0%" stop-color="#FDF3D0" />
+      <stop offset="42%" stop-color="#F0D27A" />
+      <stop offset="100%" stop-color="#9A7420" />
+    </radialGradient>
+  </defs>
+  <circle cx="32" cy="32" r="30" fill="url(#face)" />
+  <circle cx="32" cy="32" r="26" fill="none" stroke="#5C4310" stroke-opacity=".4" stroke-width="2" />
+  <!-- Drawn rather than set in type so the mark never depends on a system font. -->
+  <g fill="none" stroke="#5C4310" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M26 17h15" />
+    <path d="M38.5 17v20a9.5 9.5 0 0 1-19 0" />
+  </g>
+</svg>

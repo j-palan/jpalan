@@ -1,24 +1,16 @@
-import { useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { CustomCursor } from "@/components/CustomCursor";
 
-const NotFound = () => {
-  const location = useLocation();
-
-  useEffect(() => {
-    console.error("404 Error: User attempted to access non-existent route:", location.pathname);
-  }, [location.pathname]);
-
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-muted">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">404</h1>
-        <p className="mb-4 text-xl text-muted-foreground">Oops! Page not found</p>
-        <a href="/" className="text-primary underline hover:text-primary/90">
-          Return to Home
-        </a>
-      </div>
+const NotFound = () => (
+  <div className="flex min-h-screen items-center justify-center px-6">
+    <CustomCursor />
+    <div className="text-center">
+      <p className="font-display text-6xl text-gold-500">404</p>
+      <p className="mt-4 text-sm text-muted">Nothing here.</p>
+      <a href="/" className="link mt-8 inline-block text-sm">
+        Back to the top
+      </a>
     </div>
-  );
-};
+  </div>
+);
 
 export default NotFound;

@@ -1,153 +1,52 @@
 import type { Config } from "tailwindcss";
 
 export default {
-  darkMode: ["class"],
-  content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
-  prefix: "",
+  content: ["./index.html", "./src/**/*.{ts,tsx}"],
   theme: {
-    container: {
-      center: true,
-      padding: "2rem",
-      screens: {
-        "2xl": "1400px",
-      },
-    },
     extend: {
       fontFamily: {
-        caslon: ['"Caslon Graphique"', "Georgia", "Cambria", "Times New Roman", "serif"],
+        display: ['"Instrument Serif"', "Georgia", "Times New Roman", "serif"],
         sans: [
-          "SF Pro Display",
+          "Inter",
+          "Inter Fallback",
           "-apple-system",
           "BlinkMacSystemFont",
           "Segoe UI",
-          "Roboto",
           "Helvetica Neue",
           "Arial",
           "sans-serif",
         ],
-        mono: [
-          "SF Mono",
-          "Fira Code",
-          "Monaco",
-          "Consolas",
-          "monospace",
-        ],
       },
       colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
-        primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+        background: "hsl(var(--background) / <alpha-value>)",
+        raised: "hsl(var(--raised) / <alpha-value>)",
+        foreground: "hsl(var(--foreground) / <alpha-value>)",
+        muted: "hsl(var(--muted) / <alpha-value>)",
+        faint: "hsl(var(--faint) / <alpha-value>)",
+        line: "hsl(var(--line) / <alpha-value>)",
+        gold: {
+          100: "hsl(var(--gold-100) / <alpha-value>)",
+          300: "hsl(var(--gold-300) / <alpha-value>)",
+          500: "hsl(var(--gold-500) / <alpha-value>)",
+          700: "hsl(var(--gold-700) / <alpha-value>)",
+          900: "hsl(var(--gold-900) / <alpha-value>)",
         },
-        secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
-        },
-        destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
-        },
-        muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
-        },
-        accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
-        },
-        popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
-        },
-        card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
-        },
-        glass: {
-          DEFAULT: "hsl(var(--glass-bg))",
-          border: "hsl(var(--glass-border))",
-          highlight: "hsl(var(--glass-highlight))",
-        },
-        sidebar: {
-          DEFAULT: "hsl(var(--sidebar-background))",
-          foreground: "hsl(var(--sidebar-foreground))",
-          primary: "hsl(var(--sidebar-primary))",
-          "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
-          accent: "hsl(var(--sidebar-accent))",
-          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
-          border: "hsl(var(--sidebar-border))",
-          ring: "hsl(var(--sidebar-ring))",
-        },
-      },
-      borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
-        "2xl": "1.25rem",
-        "3xl": "1.5rem",
-        "4xl": "2rem",
-      },
-      spacing: {
-        "18": "4.5rem",
-        "22": "5.5rem",
-        "88": "22rem",
-        "100": "25rem",
-        "120": "30rem",
       },
       fontSize: {
-        "2xs": "0.625rem",
-        hero: "clamp(3rem, 8vw, 6rem)",
+        /* Instrument Serif is already narrow, so it gets air rather than
+           negative tracking — tight letterspacing on a condensed face is what
+           made this read as squashed. */
+        display: ["clamp(3rem, 7.5vw, 5rem)", { lineHeight: "1.12", letterSpacing: "0.005em" }],
       },
-      backdropBlur: {
-        xs: "8px",
-        "2xl": "40px",
-        "3xl": "60px",
-      },
-      boxShadow: {
-        glow: "0 0 60px -10px hsl(var(--accent) / 0.3)",
-        "glow-lg": "0 0 100px -20px hsl(var(--accent) / 0.4)",
-        glass: "0 8px 32px -8px hsl(225 50% 3% / 0.4)",
-        "glass-lg": "0 16px 48px -12px hsl(225 50% 3% / 0.5)",
-      },
-      keyframes: {
-        "accordion-down": {
-          from: { height: "0" },
-          to: { height: "var(--radix-accordion-content-height)" },
-        },
-        "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" },
-        },
-        "float": {
-          "0%, 100%": { transform: "translateY(0)" },
-          "50%": { transform: "translateY(-10px)" },
-        },
-        "pulse-glow": {
-          "0%, 100%": { opacity: "0.4" },
-          "50%": { opacity: "0.8" },
-        },
-        "gradient-shift": {
-          "0%": { backgroundPosition: "0% 50%" },
-          "50%": { backgroundPosition: "100% 50%" },
-          "100%": { backgroundPosition: "0% 50%" },
-        },
-      },
-      animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
-        "float": "float 6s ease-in-out infinite",
-        "pulse-glow": "pulse-glow 3s ease-in-out infinite",
-        "gradient-shift": "gradient-shift 8s ease infinite",
+      maxWidth: {
+        /* 872px = 11 grid cells of content plus 2x40px padding, which puts
+           both content edges on a vertical grid line. */
+        page: "54.5rem",
       },
       transitionTimingFunction: {
         "out-expo": "cubic-bezier(0.16, 1, 0.3, 1)",
-        "spring": "cubic-bezier(0.34, 1.56, 0.64, 1)",
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [],
 } satisfies Config;

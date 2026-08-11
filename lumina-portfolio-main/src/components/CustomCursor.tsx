@@ -1,127 +1,79 @@
-import { useEffect, useState, useRef } from "react";
-import { motion, useSpring, useMotionValue } from "framer-motion";
+import { useEffect, useState } from "react";
+import { motion, useMotionValue, useSpring } from "framer-motion";
+
+const INTERACTIVE = "a, button, [role='button'], input, textarea, select, [contenteditable]";
 
 export const CustomCursor = () => {
-  const [isHovering, setIsHovering] = useState(false);
-  const [isClicking, setIsClicking] = useState(false);
-  const cursorRef = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState(false);
+  const [hovering, setHovering] = useState(false);
+  const [pressed, setPressed] = useState(false);
 
-  const cursorX = useMotionValue(0);
-  const cursorY = useMotionValue(0);
-  const glowX = useMotionValue(0);
-  const glowY = useMotionValue(0);
-
-  const springConfig = { damping: 25, stiffness: 400 };
-  const glowSpringConfig = { damping: 50, stiffness: 200 };
-
-  const cursorXSpring = useSpring(cursorX, springConfig);
-  const cursorYSpring = useSpring(cursorY, springConfig);
-  const glowXSpring = useSpring(glowX, glowSpringConfig);
-  const glowYSpring = useSpring(glowY, glowSpringConfig);
+  const x = useMotionValue(-100);
+  const y = useMotionValue(-100);
+  const ringX = useSpring(x, { damping: 26, stiffness: 420, mass: 0.35 });
+  const ringY = useSpring(y, { damping: 26, stiffness: 420, mass: 0.35 });
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      cursorX.set(e.clientX);
-      cursorY.set(e.clientY);
-      glowX.set(e.clientX);
-      glowY.set(e.clientY);
+    const fine = window.matchMedia("(hover: hover) and (pointer: fine)");
+    if (!fine.matches) return;
+
+    setActive(true);
+    document.body.setAttribute("data-custom-cursor", "");
+
+    const onMove = (e: PointerEvent) => {
+      x.set(e.clientX);
+      y.set(e.clientY);
+    };
+    const onOver = (e: PointerEvent) => {
+      const target = e.target as Element | null;
+      setHovering(Boolean(target?.closest?.(INTERACTIVE)));
+    };
+    const onDown = () => setPressed(true);
+    const onUp = () => setPressed(false);
+    const onLeave = () => {
+      x.set(-100);
+      y.set(-100);
     };
 
-    const handleMouseDown = () => setIsClicking(true);
-    const handleMouseUp = () => setIsClicking(false);
-
-    const handleMouseEnter = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (
-        target.tagName === "A" ||
-        target.tagName === "BUTTON" ||
-        target.closest("a") ||
-        target.closest("button") ||
-        target.classList.contains("magnetic") ||
-        target.closest(".magnetic")
-      ) {
-        setIsHovering(true);
-      }
-    };
-
-    const handleMouseLeave = () => {
-      setIsHovering(false);
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mousedown", handleMouseDown);
-    window.addEventListener("mouseup", handleMouseUp);
-    document.addEventListener("mouseover", handleMouseEnter);
-    document.addEventListener("mouseout", handleMouseLeave);
+    window.addEventListener("pointermove", onMove, { passive: true });
+    window.addEventListener("pointerover", onOver, { passive: true });
+    window.addEventListener("pointerdown", onDown, { passive: true });
+    window.addEventListener("pointerup", onUp, { passive: true });
+    document.addEventListener("pointerleave", onLeave);
 
     return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mousedown", handleMouseDown);
-      window.removeEventListener("mouseup", handleMouseUp);
-      document.removeEventListener("mouseover", handleMouseEnter);
-      document.removeEventListener("mouseout", handleMouseLeave);
+      document.body.removeAttribute("data-custom-cursor");
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerover", onOver);
+      window.removeEventListener("pointerdown", onDown);
+      window.removeEventListener("pointerup", onUp);
+      document.removeEventListener("pointerleave", onLeave);
     };
-  }, [cursorX, cursorY, glowX, glowY]);
+  }, [x, y]);
 
-  // Hide on touch devices
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
-  useEffect(() => {
-    setIsTouchDevice("ontouchstart" in window);
-  }, []);
-
-  if (isTouchDevice) return null;
+  if (!active) return null;
 
   return (
     <>
-      {/* Main cursor dot */}
       <motion.div
-        ref={cursorRef}
-        className="fixed top-0 left-0 pointer-events-none z-[100] mix-blend-difference"
-        style={{
-          x: cursorXSpring,
-          y: cursorYSpring,
-        }}
-      >
-        <motion.div
-          className="relative -translate-x-1/2 -translate-y-1/2 bg-foreground rounded-full"
-          animate={{
-            width: isHovering ? 48 : isClicking ? 8 : 12,
-            height: isHovering ? 48 : isClicking ? 8 : 12,
-            opacity: isHovering ? 0.8 : 1,
-          }}
-          transition={{
-            type: "spring",
-            damping: 20,
-            stiffness: 300,
-          }}
-        />
-      </motion.div>
-
-      {/* Glow trail */}
+        aria-hidden="true"
+        className="pointer-events-none fixed left-0 top-0 z-50 h-1 w-1 rounded-full bg-gold-300"
+        style={{ x, y, translateX: "-50%", translateY: "-50%" }}
+        animate={{ opacity: hovering ? 0 : 1 }}
+        transition={{ duration: 0.15 }}
+      />
       <motion.div
-        className="fixed top-0 left-0 pointer-events-none z-[99]"
-        style={{
-          x: glowXSpring,
-          y: glowYSpring,
+        aria-hidden="true"
+        className="pointer-events-none fixed left-0 top-0 z-50 rounded-full border border-gold-300/60"
+        style={{ x: ringX, y: ringY, translateX: "-50%", translateY: "-50%" }}
+        animate={{
+          width: hovering ? 34 : 20,
+          height: hovering ? 34 : 20,
+          opacity: pressed ? 0.45 : 0.85,
+          scale: pressed ? 0.85 : 1,
         }}
-      >
-        <motion.div
-          className="relative -translate-x-1/2 -translate-y-1/2 rounded-full"
-          style={{
-            background: "radial-gradient(circle, hsl(210 100% 60% / 0.15) 0%, transparent 70%)",
-          }}
-          animate={{
-            width: isHovering ? 200 : 120,
-            height: isHovering ? 200 : 120,
-            opacity: isHovering ? 0.8 : 0.4,
-          }}
-          transition={{
-            type: "spring",
-            damping: 30,
-            stiffness: 150,
-          }}
-        />
-      </motion.div>
+        transition={{ type: "spring", damping: 22, stiffness: 320 }}
+      />
     </>
   );
 };

@@ -1,31 +1,20 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
 import Index from "./pages/Index";
-import Work from "./pages/Work";
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+/* One page. Vercel rewrites every path to index.html, so the only routing
+   decision left is "is this the home page or not" — a router would be 20 kB
+   spent on a single boolean. /work is redirected at the edge in vercel.json. */
+const isHome = () => {
+  const path = window.location.pathname.replace(/\/+$/, "");
+  return path === "" || path === "/index.html";
+};
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/work" element={<Work />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-      <Analytics />
-    </TooltipProvider>
-  </QueryClientProvider>
+  <>
+    {isHome() ? <Index /> : <NotFound />}
+    <Analytics />
+  </>
 );
 
 export default App;
