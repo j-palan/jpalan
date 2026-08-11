@@ -48,6 +48,11 @@ const Page = () => {
   const heading = useShotHit();
   const headingRef = useShotTarget<HTMLHeadingElement>({ solid: true, onHit: heading.onHit });
 
+  /* The name decodes itself once as the page arrives, then again on every hit.
+     ScrambleText treats 0 as "never run", so the reveal is what takes the
+     trigger off zero — `revealed` only ever flips once, so this cannot loop. */
+  const headingTrigger = heading.hit + (revealed ? 1 : 0);
+
   /* Explicit per-block props rather than parent/child variants, so each block's
      entrance is readable on its own line. Reduced motion gets no entrance at
      all — staggering content in is exactly what that preference asks you not
@@ -96,10 +101,14 @@ const Page = () => {
               ref={headingRef}
               className={`font-display text-display ${heading.shaking ? "shot-shake" : ""}`}
             >
-              <ScrambleText text={site.greeting} trigger={heading.hit} className="text-muted" />{" "}
+              <ScrambleText
+                text={site.greeting}
+                trigger={headingTrigger}
+                className="text-muted"
+              />{" "}
               <ScrambleText
                 text={site.firstName}
-                trigger={heading.hit}
+                trigger={headingTrigger}
                 delay={280}
                 className="italic"
               />
