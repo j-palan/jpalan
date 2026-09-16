@@ -5,11 +5,12 @@ import { CoinIntro } from "@/components/coin/CoinIntro";
 import { CoinMark } from "@/components/coin/CoinMark";
 import { CustomCursor } from "@/components/CustomCursor";
 import { ExperienceTable } from "@/components/ExperienceTable";
+import { GitHubContributions } from "@/components/GitHubContributions";
 import { ClickHint } from "@/components/shot/ClickHint";
 import { ScrambleText } from "@/components/shot/ScrambleText";
 import { ShotProvider } from "@/components/shot/ShotProvider";
 import { useShotHit, useShotTarget } from "@/components/shot/shotContext";
-import { links, site } from "@/data/site";
+import { github, links, site } from "@/data/site";
 
 const ICONS = { mail: Mail, github: Github, linkedin: Linkedin };
 
@@ -125,6 +126,14 @@ const Page = () => {
 
           <motion.section {...rise(0.18)} aria-label="Experience" className="shrink-0">
             <ExperienceTable />
+          </motion.section>
+
+          <motion.section
+            {...rise(0.28)}
+            aria-label="GitHub contributions"
+            className="flex flex-1 items-center justify-center py-14 sm:py-4"
+          >
+            <GitHubContributions username={github.username} href={github.href} />
           </motion.section>
         </main>
       </div>

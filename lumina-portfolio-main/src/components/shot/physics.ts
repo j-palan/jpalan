@@ -39,6 +39,36 @@ export type StepResult = {
   spent: boolean;
 };
 
+/** Whether the round's path this frame crosses a target. Small targets such as
+    contribution cells can be narrower than one frame of travel, so checking
+    only the final point would visibly skip them. */
+function segmentIntersectsRect(
+  fromX: number,
+  fromY: number,
+  toX: number,
+  toY: number,
+  rect: Bounds,
+) {
+  let entry = 0;
+  let exit = 1;
+
+  const clipAxis = (start: number, delta: number, min: number, max: number) => {
+    if (delta === 0) return start >= min && start <= max;
+
+    let near = (min - start) / delta;
+    let far = (max - start) / delta;
+    if (near > far) [near, far] = [far, near];
+    entry = Math.max(entry, near);
+    exit = Math.min(exit, far);
+    return entry <= exit;
+  };
+
+  return (
+    clipAxis(fromX, toX - fromX, rect.left, rect.right) &&
+    clipAxis(fromY, toY - fromY, rect.top, rect.bottom)
+  );
+}
+
 /**
  * Advances the round one frame: move, resolve target contacts, then walls.
  *
@@ -70,17 +100,25 @@ export function stepShot(
     const rect = target.rect;
     if (!rect) continue;
 
-    const overlapping =
+    const endsInside =
       shot.x >= rect.left && shot.x <= rect.right && shot.y >= rect.top && shot.y <= rect.bottom;
+    const overlapping =
+      endsInside || segmentIntersectsRect(previousX, previousY, shot.x, shot.y, rect);
 
     if (!overlapping) {
       shot.inside.delete(target.id);
       continue;
     }
-    if (shot.inside.has(target.id)) continue;
+    if (shot.inside.has(target.id)) {
+      /* A swept segment can begin inside and end beyond the far edge. Clear
+         the flag now so a later re-entry is allowed to register. */
+      if (!endsInside) shot.inside.delete(target.id);
+      continue;
+    }
     if (shot.age < (shot.cooldown.get(target.id) ?? 0)) continue;
 
-    shot.inside.add(target.id);
+    if (endsInside) shot.inside.add(target.id);
+    else shot.inside.delete(target.id);
     hits.push(target.id);
 
     if (target.solid && shot.bounces < MAX_BOUNCES && !deflected) {

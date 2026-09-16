@@ -246,6 +246,18 @@
     @apply origin-left scale-x-100;
   }
 
+  /* A native contribution calendar keeps the live data independent from its
+     presentation. It fills the available width while preserving square days,
+     and flows down each Sunday-first week before starting the next column. */
+  .github-calendar-grid {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-template-rows: repeat(7, minmax(0, 1fr));
+    gap: clamp(1px, 0.32vw, 3px);
+    width: 100%;
+  }
+
   /* Row disclosure. The row grows by exactly one cell, so every row below it
      shifts by one cell and stays on its own grid line — expanding to fit the
      text would walk the whole table off the grid. */

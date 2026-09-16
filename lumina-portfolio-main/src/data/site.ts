@@ -15,8 +15,13 @@ export const intro = {
   tail: "I care most about work that ends up in front of a lot of people.",
 };
 
+export const github = {
+  username: "j-palan",
+  href: "https://github.com/j-palan",
+} as const;
+
 export const links = [
   { label: "Email", href: "mailto:j2palan@uwaterloo.ca", icon: "mail" },
-  { label: "GitHub", href: "https://github.com/j-palan", icon: "github" },
+  { label: "GitHub", href: github.href, icon: "github" },
   { label: "LinkedIn", href: "https://www.linkedin.com/in/jai-palan", icon: "linkedin" },
 ] as const;

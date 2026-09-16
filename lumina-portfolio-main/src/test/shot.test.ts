@@ -50,6 +50,18 @@ describe("pass-through targets", () => {
     const back = stepShot(round, 0.25, row, VIEWPORT, noJitter);
     expect(back.hits).toEqual(["row"]);
   });
+
+  it("hits every small target crossed between frames", () => {
+    const cells = [
+      box("day-1", false, { left: 120, right: 128, top: 96, bottom: 104 }),
+      box("day-2", false, { left: 140, right: 148, top: 96, bottom: 104 }),
+      box("day-3", false, { left: 160, right: 168, top: 96, bottom: 104 }),
+    ];
+
+    const round = shot({ vx: 1000 });
+    const { hits } = stepShot(round, 0.1, cells, VIEWPORT, noJitter);
+    expect(hits).toEqual(["day-1", "day-2", "day-3"]);
+  });
 });
 
 describe("solid targets", () => {
