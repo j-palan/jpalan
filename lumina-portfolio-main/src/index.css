@@ -42,12 +42,15 @@
 
 @layer base {
   :root {
-    --background: 240 6% 4%;
-    --raised: 240 5% 7%;
-    --foreground: 40 12% 96%;
-    --muted: 40 5% 52%;
-    --faint: 40 5% 34%;
-    --line: 240 5% 13%;
+    /* British racing green and warm ivory. Even the faintest copy stays above
+       4.5:1 against the page, so the quiet hierarchy remains legible. */
+    --background: 164 69% 14%;
+    --raised: 162 62% 18%;
+    --foreground: 42 100% 95%;
+    --muted: 45 32% 78%;
+    --faint: 44 19% 65%;
+    --line: 164 36% 26%;
+    --racing-red: 4 58% 44%;
 
     /* The coin sets the palette — gold is the only accent on the site.
        000 and 050 are the mirror extremes: polished metal reflects a bright
@@ -127,7 +130,7 @@
   }
 
   :focus-visible {
-    outline: 1px solid hsl(var(--gold-500) / 0.7);
+    outline: 1px solid hsl(var(--gold-500) / 0.8);
     outline-offset: 3px;
   }
 
@@ -139,96 +142,88 @@
 }
 
 @layer components {
-  /* Thin graph-paper grid behind the page. Fixed, so it reads as the surface
-     the content sits on rather than something that scrolls with it. */
+  /* A quiet circuit backdrop: lacquer-like pools of light under two winding
+     SVG track segments. The circuit stays decorative and out of hit testing. */
   .page-grid {
     position: fixed;
     inset: 0;
     z-index: 0;
+    overflow: hidden;
     pointer-events: none;
-    background-image:
-      linear-gradient(to right, hsl(var(--line)) 1px, transparent 1px),
-      linear-gradient(to bottom, hsl(var(--line)) 1px, transparent 1px);
-    background-size: var(--grid) var(--grid);
-    /* Start the pattern at the first row rather than at the top of the screen,
-       so every row rule falls on a grid line no matter the masthead height. */
-    background-position: center var(--masthead);
-    -webkit-mask-image: linear-gradient(
-      to bottom,
-      transparent 0%,
-      hsl(0 0% 0% / 0.45) 9%,
-      #000 30%,
-      #000 68%,
-      transparent 97%
-    );
-    mask-image: linear-gradient(
-      to bottom,
-      transparent 0%,
-      hsl(0 0% 0% / 0.45) 9%,
-      #000 30%,
-      #000 68%,
-      transparent 97%
-    );
+    background:
+      radial-gradient(ellipse at 16% 8%, hsl(var(--foreground) / 0.045), transparent 38%),
+      radial-gradient(ellipse at 84% 92%, hsl(var(--gold-500) / 0.075), transparent 36%),
+      linear-gradient(135deg, hsl(var(--raised) / 0.52), transparent 46%);
   }
 
-  /* A band of light that crosses the grid every few seconds, so the page has a
-     pulse without anything actually moving. Same pattern, size and origin as
-     .page-grid, so it lights the existing lines rather than drawing new ones —
-     and it sits inside .page-grid, whose mask already fades it top and bottom.
-
-     The mask is three viewports wide with the band in the middle third. At
-     mask-position 0% that middle third sits off the right edge and at 100% off
-     the left, so the sweep runs 100% -> 0% to travel left to right. */
-  .page-grid-wave {
+  .race-backdrop {
     position: absolute;
     inset: 0;
-    background-image:
-      linear-gradient(to right, hsl(var(--gold-500) / 0.16) 1px, transparent 1px),
-      linear-gradient(to bottom, hsl(var(--gold-500) / 0.16) 1px, transparent 1px);
-    background-size: var(--grid) var(--grid);
-    background-position: center var(--masthead);
-    -webkit-mask-image: linear-gradient(
-      100deg,
-      transparent 30%,
-      hsl(0 0% 0% / 0.3) 42%,
-      #000 50%,
-      hsl(0 0% 0% / 0.3) 58%,
-      transparent 70%
-    );
-    mask-image: linear-gradient(
-      100deg,
-      transparent 30%,
-      hsl(0 0% 0% / 0.3) 42%,
-      #000 50%,
-      hsl(0 0% 0% / 0.3) 58%,
-      transparent 70%
-    );
-    -webkit-mask-size: 300% 100%;
-    mask-size: 300% 100%;
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    animation: grid-wave 6s ease-in-out infinite;
+    width: 100%;
+    height: 100%;
+    opacity: 0.55;
   }
 
-  /* Crosses left to right over the first 40% of the cycle, then waits out the
-     rest off-screen. The hold is what keeps it a pulse rather than a
-     conveyor — roughly 2.4s crossing, 3.6s of stillness. */
-  @keyframes grid-wave {
-    0% {
-      -webkit-mask-position: 100% 0;
-      mask-position: 100% 0;
-    }
-    40%,
-    100% {
-      -webkit-mask-position: 0% 0;
-      mask-position: 0% 0;
-    }
+  .race-road-edge,
+  .race-road-bed,
+  .race-kerb {
+    fill: none;
+    stroke-linejoin: round;
+  }
+
+  .race-road-edge {
+    stroke: hsl(var(--muted) / 0.11);
+    stroke-width: 82;
+  }
+
+  .race-road-bed {
+    stroke: hsl(var(--raised));
+    stroke-width: 70;
+  }
+
+  .race-kerb {
+    stroke-width: 5;
+    stroke-linecap: butt;
+  }
+
+  .race-kerb--cream {
+    stroke: hsl(var(--foreground) / 0.6);
+  }
+
+  .race-kerb--red {
+    stroke: hsl(var(--racing-red) / 0.75);
+  }
+
+  .race-skids {
+    stroke: hsl(164 60% 7%);
+    stroke-width: 1.4;
+    stroke-linecap: round;
+  }
+
+  .race-car {
+    opacity: 0.9;
+  }
+
+  .race-car-tires {
+    fill: hsl(164 35% 7%);
+  }
+
+  .race-car-body {
+    fill: currentColor;
+    stroke: hsl(var(--background) / 0.72);
+    stroke-width: 0.8;
+  }
+
+  .race-car-cockpit {
+    fill: hsl(var(--background));
+    stroke: none;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .page-grid-wave {
+    .race-car,
+    .race-skids {
       animation: none;
-      opacity: 0;
+      display: none;
     }
   }
 

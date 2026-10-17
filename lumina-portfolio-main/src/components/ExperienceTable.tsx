@@ -17,8 +17,8 @@ const Arrow = () => (
   </svg>
 );
 
-/* Each row is one grid cell tall and grows to two on hover, so its rule — and
-   every rule below it — stays on a grid line. The round passes straight
+/* Each row is one grid cell tall and grows to two on hover, keeping the
+   timeline's spacing consistent. The round passes straight
    through; only the display type turns it. The row still reloads, with the
    wave sweeping year → org → role → dates. */
 const ExperienceRow = ({ role }: { role: Role }) => {
@@ -28,7 +28,7 @@ const ExperienceRow = ({ role }: { role: Role }) => {
   return (
     <li
       ref={ref}
-      className={`row group/row relative border-t border-line ${shaking ? "shot-shake" : ""}`}
+      className={`row group/row relative ${shaking ? "shot-shake" : ""}`}
     >
       {/* Timeline marker, centred in the first cell and sitting on the rail. */}
       <span
@@ -95,7 +95,7 @@ const ExperienceRow = ({ role }: { role: Role }) => {
 };
 
 export const ExperienceTable = () => (
-  <ul className="relative border-b border-line">
+  <ul className="relative">
     {/* The rail sits on a vertical grid line, since the content box is cut to
         a whole number of cells. */}
     <span aria-hidden="true" className="absolute inset-y-0 left-0 hidden w-px bg-line sm:block" />

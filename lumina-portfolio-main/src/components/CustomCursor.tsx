@@ -57,20 +57,21 @@ export const CustomCursor = () => {
     <>
       <motion.div
         aria-hidden="true"
-        className="pointer-events-none fixed left-0 top-0 z-50 h-1 w-1 rounded-full bg-gold-300"
+        className="pointer-events-none fixed left-0 top-0 z-50 h-1 w-1 rounded-full bg-foreground"
         style={{ x, y, translateX: "-50%", translateY: "-50%" }}
         animate={{ opacity: hovering ? 0 : 1 }}
         transition={{ duration: 0.15 }}
       />
       <motion.div
         aria-hidden="true"
-        className="pointer-events-none fixed left-0 top-0 z-50 rounded-full border border-gold-300/60"
+        className="pointer-events-none fixed left-0 top-0 z-50 rounded-full border border-foreground/60"
         style={{ x: ringX, y: ringY, translateX: "-50%", translateY: "-50%" }}
         animate={{
           width: hovering ? 34 : 20,
           height: hovering ? 34 : 20,
           opacity: pressed ? 0.45 : 0.85,
           scale: pressed ? 0.85 : 1,
+          backgroundColor: hovering ? "hsl(var(--foreground) / 0.08)" : "hsl(var(--background) / 0)",
         }}
         transition={{ type: "spring", damping: 22, stiffness: 320 }}
       />

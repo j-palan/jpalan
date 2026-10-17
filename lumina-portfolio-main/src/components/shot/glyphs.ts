@@ -13,13 +13,13 @@ export const GLYPHS = [
 
 /** Colours a scrambling glyph can take before it settles. */
 export const SCRAMBLE_COLORS = [
+  "#fff8e7",
+  "#f2ead5",
+  "#d9d0b5",
+  "#b8cdbf",
   "#f0d27a",
-  "#8ad7b0",
-  "#7fb4f5",
-  "#e58fc0",
-  "#c9a3f5",
-  "#f2a65a",
-  "#6fd6d0",
+  "#d8b65a",
+  "#c7d8ca",
 ];
 
 export const pick = <T,>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];

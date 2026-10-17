@@ -6,6 +6,7 @@ import { CoinMark } from "@/components/coin/CoinMark";
 import { CustomCursor } from "@/components/CustomCursor";
 import { ExperienceTable } from "@/components/ExperienceTable";
 import { GitHubContributions } from "@/components/GitHubContributions";
+import { RacetrackBackdrop } from "@/components/RacetrackBackdrop";
 import { ClickHint } from "@/components/shot/ClickHint";
 import { ScrambleText } from "@/components/shot/ScrambleText";
 import { ShotProvider } from "@/components/shot/ShotProvider";
@@ -78,7 +79,7 @@ const Page = () => {
         animate={{ opacity: prefersReduced || revealed ? 1 : 0 }}
         transition={{ duration: prefersReduced ? 0 : 0.9, ease: EASE }}
       >
-        <span className="page-grid-wave" />
+        <RacetrackBackdrop />
       </motion.div>
 
       <div className={revealed ? "relative z-10" : "pointer-events-none relative z-10"}>
