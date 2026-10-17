@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { measureTrack, type TrackGeometry } from "@/lib/racetrackGeometry";
 
 // Both visible sections run in race order; the connecting straights are off-screen.
 const LOWER_TRACK = "M-180 540C100 560 330 670 280 810C250 900 160 990 100 1100";
@@ -18,11 +19,10 @@ const CARS = [
 
 /** Integrate travel time along the road, braking for curvature. Smoothing the
  * speed over neighboring samples creates gradual braking and acceleration. */
-const buildPace = (path: SVGPathElement, entryBoost = 0, exitBoost = 0, cornerDrag = 10, entryHold = 0) => {
-  const length = path.getTotalLength();
+const buildPace = (geometry: TrackGeometry, entryBoost = 0, exitBoost = 0, cornerDrag = 10, entryHold = 0) => {
+  const { length, pointAt } = geometry;
   const samples = 400;
   const step = length / samples;
-  const pointAt = (distance: number) => path.getPointAtLength(Math.max(0, Math.min(length, distance)));
   const speeds = Array.from({ length: samples + 1 }, (_, index) => {
     const distance = index * step;
     const before = pointAt(distance - 10);
@@ -78,9 +78,11 @@ const buildPace = (path: SVGPathElement, entryBoost = 0, exitBoost = 0, cornerDr
 
 /** Stripe the actual offset edges by arc length, avoiding stretched wedges
  * from dashing a road-wide stroke. Curvature controls the soft corner fades. */
-const drawKerbs = (path: SVGPathElement, group: SVGGElement, sensitivity = 1) => {
-  const length = path.getTotalLength();
-  const pointAt = (distance: number) => path.getPointAtLength(Math.max(0, Math.min(length, distance)));
+const drawKerbs = (geometry: TrackGeometry, group: SVGGElement, sensitivity = 1) => {
+  const { length, pointAt } = geometry;
+  // Combine pieces by color and fade level, including all fully bright pieces
+  // in two paths. Never create DOM nodes for invisible pieces.
+  const batches = new Map<string, { red: boolean; opacity: number; parts: string[] }>();
   const samples = Array.from({ length: Math.ceil(length / 3) + 1 }, (_, index) => {
     const distance = Math.min(length, index * 3);
     const before = pointAt(distance - 10);
@@ -138,19 +140,34 @@ const drawKerbs = (path: SVGPathElement, group: SVGGElement, sensitivity = 1) =>
         const part = Math.min(segmentLength - consumed, (stripe + 1) * 11 - edgeDistance);
         const start = consumed / segmentLength;
         const end = (consumed + part) / segmentLength;
-        const line = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        line.setAttribute("d", `M${from.x + (to.x - from.x) * start} ${from.y + (to.y - from.y) * start}L${from.x + (to.x - from.x) * end} ${from.y + (to.y - from.y) * end}`);
-        line.setAttribute("class", stripe % 2 ? "race-kerb race-kerb--red" : "race-kerb race-kerb--cream");
-        line.setAttribute("opacity", String((fades[index - 1] + fades[index]) / 2));
-        group.appendChild(line);
+        const opacity = Math.round((fades[index - 1] + fades[index]) / 2 * 16) / 16;
+        if (opacity > 0) {
+          const red = Boolean(stripe % 2);
+          const key = `${red}:${opacity}`;
+          let batch = batches.get(key);
+          if (!batch) {
+            batch = { red, opacity, parts: [] };
+            batches.set(key, batch);
+          }
+          batch.parts.push(`M${(from.x + (to.x - from.x) * start).toFixed(2)} ${(from.y + (to.y - from.y) * start).toFixed(2)}L${(from.x + (to.x - from.x) * end).toFixed(2)} ${(from.y + (to.y - from.y) * end).toFixed(2)}`);
+        }
         consumed += part;
         edgeDistance += part;
       }
     }
   }
+  const fragment = document.createDocumentFragment();
+  for (const batch of batches.values()) {
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    line.setAttribute("d", batch.parts.join(""));
+    line.setAttribute("class", batch.red ? "race-kerb race-kerb--red" : "race-kerb race-kerb--cream");
+    line.setAttribute("opacity", String(batch.opacity));
+    fragment.appendChild(line);
+  }
+  group.appendChild(fragment);
 };
 
-export const RacetrackBackdrop = () => {
+export const RacetrackBackdrop = ({ active }: { active: boolean }) => {
   const lowerRef = useRef<SVGPathElement>(null);
   const upperRef = useRef<SVGPathElement>(null);
   const carsRef = useRef<(SVGGElement | null)[]>([]);
@@ -158,19 +175,22 @@ export const RacetrackBackdrop = () => {
   const kerbsRef = useRef<SVGGElement>(null);
 
   useEffect(() => {
+    if (!active) return;
     const lower = lowerRef.current;
     const upper = upperRef.current;
     const skids = skidsRef.current;
     const kerbs = kerbsRef.current;
     if (!lower || !upper || !skids || !kerbs) return;
+    const lowerGeometry = measureTrack(lower);
+    const upperGeometry = measureTrack(upper);
     // Both sections use broad radii; preserve visible corner kerbs without
     // carrying the stripes along the straights.
-    drawKerbs(lower, kerbs, 1.8);
-    drawKerbs(upper, kerbs, 1.8);
+    drawKerbs(lowerGeometry, kerbs, 1.8);
+    drawKerbs(upperGeometry, kerbs, 1.8);
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const lowerPace = buildPace(lower, 1.2);
+    const lowerPace = buildPace(lowerGeometry, 1.2);
     // Carry full speed through the wide upper sweep without braking.
-    const upperPace = buildPace(upper, 0, 0.35, 0);
+    const upperPace = buildPace(upperGeometry, 0, 0.35, 0);
     let frame = 0;
     let elapsed = 0;
     let previous = 0;
@@ -191,12 +211,11 @@ export const RacetrackBackdrop = () => {
         const element = carsRef.current[index];
         element?.setAttribute("visibility", visible ? "visible" : "hidden");
         if (!visible) return;
-        const path = onLower ? lower : upper;
+        const geometry = onLower ? lowerGeometry : upperGeometry;
         const pace = onLower ? lowerPace : upperPace;
-        const length = pace.length;
         const progress = onLower ? lapTime / 4 : (upperTime - 6) / 4.5;
         const distance = pace.distanceAt(progress);
-        const pointAt = (position: number) => path.getPointAtLength(Math.max(0, Math.min(length, position)));
+        const { pointAt } = geometry;
         const point = pointAt(distance);
         const ahead = pointAt(distance + 5);
         const behind = pointAt(distance - 5);
@@ -230,13 +249,22 @@ export const RacetrackBackdrop = () => {
       for (const mark of marks) mark.element.setAttribute("opacity", String(0.45 * (1 - (elapsed - mark.created) / 3.5)));
       frame = requestAnimationFrame(tick);
     };
-    frame = requestAnimationFrame(tick);
+    const syncPlayback = () => {
+      cancelAnimationFrame(frame);
+      previous = 0;
+      if (!document.hidden && !reducedMotion.matches) frame = requestAnimationFrame(tick);
+    };
+    document.addEventListener("visibilitychange", syncPlayback);
+    reducedMotion.addEventListener("change", syncPlayback);
+    syncPlayback();
     return () => {
       cancelAnimationFrame(frame);
+      document.removeEventListener("visibilitychange", syncPlayback);
+      reducedMotion.removeEventListener("change", syncPlayback);
       skids.replaceChildren();
       kerbs.replaceChildren();
     };
-  }, []);
+  }, [active]);
 
   return (
     <svg aria-hidden="true" className="race-backdrop" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
@@ -253,7 +281,7 @@ export const RacetrackBackdrop = () => {
       <g ref={kerbsRef} />
       <g ref={skidsRef} className="race-skids" />
       {CARS.map((car, index) => (
-        <g key={car.color} ref={(element) => { carsRef.current[index] = element; }} className="race-car" style={{ color: car.color }}>
+        <g key={car.color} ref={(element) => { carsRef.current[index] = element; }} className="race-car" visibility="hidden" style={{ color: car.color }}>
           {/* Nose points along +X to match the path tangent. */}
           <g className="race-car-tires">
             <rect x="5" y="-9" width="7" height="4" rx="1" />

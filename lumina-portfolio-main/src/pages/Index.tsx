@@ -44,6 +44,7 @@ const IconLink = ({ link }: { link: Link }) => {
 const Page = () => {
   const [revealed, setRevealed] = useState(false);
   const [markVisible, setMarkVisible] = useState(false);
+  const [introComplete, setIntroComplete] = useState(false);
   const prefersReduced = useReducedMotion();
 
   /* Display type turns the round; so does each icon. */
@@ -71,7 +72,11 @@ const Page = () => {
   return (
     <div id="top">
       <CustomCursor />
-      <CoinIntro onReveal={() => setRevealed(true)} onHandoff={() => setMarkVisible(true)} />
+      <CoinIntro
+        onReveal={() => setRevealed(true)}
+        onHandoff={() => setMarkVisible(true)}
+        onComplete={() => setIntroComplete(true)}
+      />
 
       <motion.div
         className="page-grid"
@@ -79,7 +84,7 @@ const Page = () => {
         animate={{ opacity: prefersReduced || revealed ? 1 : 0 }}
         transition={{ duration: prefersReduced ? 0 : 0.9, ease: EASE }}
       >
-        <RacetrackBackdrop />
+        <RacetrackBackdrop active={introComplete} />
       </motion.div>
 
       <div className={revealed ? "relative z-10" : "pointer-events-none relative z-10"}>

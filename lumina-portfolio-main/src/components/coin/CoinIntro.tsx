@@ -17,9 +17,11 @@ type CoinIntroProps = {
   onReveal: () => void;
   /** Flying coin has arrived — the corner mark takes over. */
   onHandoff: () => void;
+  /** Intro overlay has unmounted; background motion can start. */
+  onComplete: () => void;
 };
 
-export const CoinIntro = ({ onReveal, onHandoff }: CoinIntroProps) => {
+export const CoinIntro = ({ onReveal, onHandoff, onComplete }: CoinIntroProps) => {
   const prefersReduced = useReducedMotion();
   const play = !prefersReduced;
 
@@ -39,14 +41,17 @@ export const CoinIntro = ({ onReveal, onHandoff }: CoinIntroProps) => {
   /* Callbacks live in refs so the timeline effect runs exactly once. */
   const revealRef = useRef(onReveal);
   const handoffRef = useRef(onHandoff);
+  const completeRef = useRef(onComplete);
   revealRef.current = onReveal;
   handoffRef.current = onHandoff;
+  completeRef.current = onComplete;
 
   useEffect(() => {
     if (!play) {
       revealRef.current();
       handoffRef.current();
       setGone(true);
+      completeRef.current();
       return;
     }
 
@@ -106,7 +111,10 @@ export const CoinIntro = ({ onReveal, onHandoff }: CoinIntroProps) => {
       });
       at(schedule.flip, () => flyToMark(schedule.flipDuration));
       at(schedule.handoff, () => handoffRef.current());
-      at(schedule.end, () => setGone(true));
+      at(schedule.end, () => {
+        setGone(true);
+        completeRef.current();
+      });
     };
 
     let skipped = false;
@@ -128,6 +136,7 @@ export const CoinIntro = ({ onReveal, onHandoff }: CoinIntroProps) => {
       revealRef.current();
       handoffRef.current();
       setGone(true);
+      completeRef.current();
     }, TIMING.failsafe * 1000);
 
     const options: AddEventListenerOptions = { passive: true };
