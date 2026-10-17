@@ -19,6 +19,14 @@ export const experience: Role[] = [
     note: "Built an LLM-as-judge harness that benchmarks autonomous coding agents against human-merged pull requests.",
   },
   {
+    year: "2026",
+    org: "Cadence",
+    href: "https://cadencecv.ca/",
+    role: "400+ users",
+    dates: "Try now!",
+    note: "Turns your coding agent’s running log of shipped work into a tailored, one-page LaTeX resume.",
+  },
+  {
     year: "2025",
     org: "VITALL",
     href: "https://www.vitall.com/",
@@ -48,13 +56,5 @@ export const experience: Role[] = [
     href: "https://uwaterloo.ca/",
     role: "Nano-Science + CS",
     dates: "2023 – Present",
-  },
-  {
-    year: "2026",
-    org: "Cadence",
-    href: "https://cadencecv.ca/",
-    role: "400+ users",
-    dates: "try here!",
-    note: "Turns your coding agent’s running log of shipped work into a tailored, one-page LaTeX resume.",
   },
 ];

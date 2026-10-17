@@ -83,7 +83,10 @@
      than the content being cut off. */
   @media (min-width: 640px) and (min-height: 640px) {
     :root {
-      --masthead: max(190px, calc((100dvh - 5 * var(--grid)) / 2));
+      /* Balance the masthead against all six table rows. Keeping this count in
+         sync prevents the contribution chart from being pushed toward the
+         bottom edge when a row is added. */
+      --masthead: max(190px, calc((100dvh - 6 * var(--grid)) / 2));
     }
 
     html,
