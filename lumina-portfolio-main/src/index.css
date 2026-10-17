@@ -65,7 +65,7 @@
     --table-y: 63%;
 
     /* One grid cell, and one experience row. */
-    --grid: 72px;
+    --grid: 64px;
 
     /* Height of the masthead above the table. The grid is anchored to this
        rather than to the top of the viewport, so the rows land on grid lines

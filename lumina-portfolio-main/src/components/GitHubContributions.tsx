@@ -97,7 +97,7 @@ export const GitHubContributions = ({ username, href }: GitHubContributionsProps
       target="_blank"
       rel="noopener noreferrer"
       aria-label={`View ${username}'s GitHub contribution activity`}
-      className="group/github block w-[85%] max-w-[35.7rem]"
+      className="group/github block w-[85%] max-w-[35.7rem] sm:-translate-y-1"
     >
       <span
         role="img"
@@ -124,6 +124,16 @@ export const GitHubContributions = ({ username, href }: GitHubContributionsProps
             />
           ),
         )}
+      </span>
+      <span
+        aria-live="polite"
+        className="mt-2 block min-h-4 font-mono text-[0.6875rem] tabular-nums text-faint"
+      >
+        {failed
+          ? "Contributions unavailable"
+          : total === undefined
+            ? "Loading contributions…"
+            : `${total.toLocaleString()} contributions`}
       </span>
     </a>
   );

@@ -40,7 +40,7 @@ const ExperienceRow = ({ role }: { role: Role }) => {
         href={role.href}
         target="_blank"
         rel="noopener noreferrer"
-        className="grid grid-cols-[2.5rem_minmax(0,1fr)_1rem] items-center gap-x-4 gap-y-1 py-5 sm:h-[var(--grid)] sm:grid-cols-[4.5rem_10rem_minmax(0,1fr)_7rem_1rem] sm:gap-x-6 sm:gap-y-0 sm:py-0 sm:pl-7"
+        className="grid grid-cols-[2.5rem_minmax(0,1fr)_1rem] items-center gap-x-4 gap-y-1 py-4 sm:h-[var(--grid)] sm:grid-cols-[4.5rem_10rem_minmax(0,1fr)_7rem_1rem] sm:gap-x-6 sm:gap-y-0 sm:py-0 sm:pl-7"
       >
         <ScrambleText
           text={role.year}
@@ -86,7 +86,7 @@ const ExperienceRow = ({ role }: { role: Role }) => {
           year column and one 1.5rem gap — and centred in the cell the row grew
           into. */}
       {role.note && (
-        <p className="row-note pb-4 pl-[3.5rem] pr-2 text-[0.8125rem] leading-snug text-muted sm:flex sm:h-[var(--grid)] sm:items-center sm:pb-0 sm:pl-[7.75rem] sm:pr-32">
+        <p className="row-note pb-3 pl-[3.5rem] pr-2 text-[0.8125rem] leading-snug text-muted sm:flex sm:h-[var(--grid)] sm:items-center sm:pb-0 sm:pl-[7.75rem] sm:pr-32">
           {role.note}
         </p>
       )}

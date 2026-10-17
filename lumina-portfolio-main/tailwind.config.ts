@@ -39,9 +39,9 @@ export default {
         display: ["clamp(3rem, 7.5vw, 5rem)", { lineHeight: "1.12", letterSpacing: "0.005em" }],
       },
       maxWidth: {
-        /* 872px = 11 grid cells of content plus 2x40px padding, which puts
+        /* 784px = 11 grid cells of content plus 2x40px padding, which puts
            both content edges on a vertical grid line. */
-        page: "54.5rem",
+        page: "49rem",
       },
       transitionTimingFunction: {
         "out-expo": "cubic-bezier(0.16, 1, 0.3, 1)",
