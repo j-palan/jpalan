@@ -49,4 +49,12 @@ export const experience: Role[] = [
     role: "Nano-Science + CS",
     dates: "2023 – Present",
   },
+  {
+    year: "2026",
+    org: "Cadence",
+    href: "https://cadencecv.ca/",
+    role: "400+ users",
+    dates: "try here!",
+    note: "Turns your coding agent’s running log of shipped work into a tailored, one-page LaTeX resume.",
+  },
 ];

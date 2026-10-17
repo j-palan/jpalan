@@ -3,8 +3,8 @@ import { experience } from "@/data/experience";
 import { links } from "@/data/site";
 
 describe("experience data", () => {
-  it("is ordered newest first", () => {
-    const years = experience.map((role) => Number(role.year));
+  it("keeps work history ordered newest first", () => {
+    const years = experience.slice(0, -1).map((role) => Number(role.year));
     expect(years).toEqual([...years].sort((a, b) => b - a));
   });
 
@@ -12,6 +12,20 @@ describe("experience data", () => {
     for (const role of experience) {
       expect(role.href).toMatch(/^https:\/\//);
     }
+  });
+
+  it("lists Cadence beneath Waterloo with its project call to action", () => {
+    const waterlooIndex = experience.findIndex((role) => role.org === "Waterloo");
+    const cadence = experience[waterlooIndex + 1];
+
+    expect(cadence).toMatchObject({
+      year: "2026",
+      org: "Cadence",
+      href: "https://cadencecv.ca/",
+      role: "400+ users",
+      dates: "try here!",
+      note: "Turns your coding agent’s running log of shipped work into a tailored, one-page LaTeX resume.",
+    });
   });
 
   it("keeps every note to a single line", () => {
