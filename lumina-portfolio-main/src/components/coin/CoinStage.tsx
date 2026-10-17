@@ -10,9 +10,7 @@ import { Bullet } from "./Bullet";
 import { Coin } from "./Coin";
 import { REST_TILT } from "./useCoinTimeline";
 
-/** Degrees per second at which the coin starts to smear, and how far it goes.
-    Kept to a hint: just enough to take the strobe off the fastest frames, well
-    short of losing the metal. */
+/** A hint of directional blur takes the strobe off the fastest frames. */
 const BLUR_FLOOR = 900;
 const BLUR_DIVISOR = 380;
 const BLUR_MAX = 2.5;
@@ -76,11 +74,6 @@ export const CoinStage = ({
     flat,
     (f) => `blur(${(2.5 + f * 2).toFixed(1)}px) brightness(0.5) saturate(0.85)`,
   );
-
-  /* Real motion blur, not a fake. Without it a fast spin strobes: at 5 rev/s
-     the face lands somewhere different every frame and the eye reads a
-     flickering cutout rather than a spinning object. Horizontal only, because
-     the coin turns about the table normal. */
   const spinVelocity = useVelocity(rotY);
   const blurRef = useRef<SVGFEGaussianBlurElement>(null);
   useMotionValueEvent(spinVelocity, "change", (v) => {
@@ -97,7 +90,6 @@ export const CoinStage = ({
           <feGaussianBlur ref={blurRef} stdDeviation="0 0" />
         </filter>
       </svg>
-
       <motion.div className="stage-backdrop" style={{ opacity: backdropOpacity }}>
         <div className="stage-key" />
 
@@ -111,8 +103,6 @@ export const CoinStage = ({
           </div>
         </div>
 
-        {/* Mirror through the table plane. Same world, same camera, so this is
-            a real reflection rather than a second guess at one. */}
         <motion.div
           className="coin-reflection"
           style={{ opacity: reflectionOpacity, filter: reflectionFilter }}

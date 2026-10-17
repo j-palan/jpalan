@@ -348,9 +348,7 @@
 
 .stage-coin-layer {
   will-change: transform, opacity;
-  /* Directional blur driven by angular velocity. The filter wraps an element
-     that starts its own perspective, so the 3D inside survives being
-     filtered — the same trick the reflection uses. */
+  /* Keep the filter outside the coin's own 3D perspective context. */
   filter: url(#coin-spin-blur);
 }
 
@@ -381,8 +379,7 @@
   );
 }
 
-/* The filter sits on a wrapper that starts its own perspective inside, so
-   blurring the reflection does not flatten its 3D. */
+/* A separate wrapper preserves the reflected coin's 3D scene under blur. */
 .coin-reflection {
   position: absolute;
   inset: 0;
@@ -391,7 +388,6 @@
   will-change: filter, opacity;
 }
 
-/* Filter definitions only — never painted. */
 .stage-defs {
   position: absolute;
   width: 0;

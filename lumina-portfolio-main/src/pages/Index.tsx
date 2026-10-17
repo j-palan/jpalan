@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Github, Linkedin, Mail } from "lucide-react";
 import { CoinIntro } from "@/components/coin/CoinIntro";
@@ -45,7 +45,20 @@ const Page = () => {
   const [revealed, setRevealed] = useState(false);
   const [markVisible, setMarkVisible] = useState(false);
   const [introComplete, setIntroComplete] = useState(false);
+  const [detailsReady, setDetailsReady] = useState(false);
   const prefersReduced = useReducedMotion();
+
+  useEffect(() => {
+    if (!revealed) return;
+    if (prefersReduced) {
+      setDetailsReady(true);
+      return;
+    }
+    // Let the name's delayed scramble finish (~1.04s) before mounting the
+    // remaining sections, starting the calendar request, or preparing the track.
+    const timer = window.setTimeout(() => setDetailsReady(true), 1200);
+    return () => window.clearTimeout(timer);
+  }, [revealed, prefersReduced]);
 
   /* Display type turns the round; so does each icon. */
   const heading = useShotHit();
@@ -60,13 +73,13 @@ const Page = () => {
      entrance is readable on its own line. Reduced motion gets no entrance at
      all — staggering content in is exactly what that preference asks you not
      to do — so the page is simply there. */
-  const rise = (delay: number) =>
+  const rise = (delay: number, ready = revealed) =>
     prefersReduced
       ? { initial: false as const, animate: { opacity: 1, y: 0 }, transition: { duration: 0 } }
       : {
           initial: { opacity: 0, y: 18 },
-          animate: revealed ? { opacity: 1, y: 0 } : { opacity: 0, y: 18 },
-          transition: { duration: 0.7, delay: revealed ? delay : 0, ease: EASE },
+          animate: ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 18 },
+          transition: { duration: 0.7, delay: ready ? delay : 0, ease: EASE },
         };
 
   return (
@@ -81,10 +94,10 @@ const Page = () => {
       <motion.div
         className="page-grid"
         initial={prefersReduced ? false : { opacity: 0 }}
-        animate={{ opacity: prefersReduced || revealed ? 1 : 0 }}
+        animate={{ opacity: detailsReady ? 1 : 0 }}
         transition={{ duration: prefersReduced ? 0 : 0.9, ease: EASE }}
       >
-        <RacetrackBackdrop active={introComplete} />
+        <RacetrackBackdrop active={introComplete && detailsReady} />
       </motion.div>
 
       <div className={revealed ? "relative z-10" : "pointer-events-none relative z-10"}>
@@ -96,8 +109,8 @@ const Page = () => {
             {markVisible && <ClickHint />}
           </div>
 
-          <motion.nav {...rise(0)} className="flex items-center gap-5">
-            {links.map((link) => (
+          <motion.nav {...rise(0, detailsReady)} className="flex items-center gap-5">
+            {detailsReady && links.map((link) => (
               <IconLink key={link.label} link={link} />
             ))}
           </motion.nav>
@@ -130,16 +143,16 @@ const Page = () => {
             </motion.h1>
           </div>
 
-          <motion.section {...rise(0.18)} aria-label="Experience" className="shrink-0">
-            <ExperienceTable />
+          <motion.section {...rise(0.08, detailsReady)} aria-label="Experience" className="shrink-0 sm:min-h-[calc(6*var(--grid))]">
+            {detailsReady && <ExperienceTable />}
           </motion.section>
 
           <motion.section
-            {...rise(0.28)}
+            {...rise(0.2, detailsReady)}
             aria-label="GitHub contributions"
             className="flex flex-1 items-center justify-center py-14 sm:py-4"
           >
-            <GitHubContributions username={github.username} href={github.href} />
+            {detailsReady && <GitHubContributions username={github.username} href={github.href} />}
           </motion.section>
         </main>
       </div>
