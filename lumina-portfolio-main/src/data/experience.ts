@@ -15,7 +15,7 @@ export const experience: Role[] = [
     org: "OpsLevel",
     href: "https://www.opslevel.com/",
     role: "Software Engineer Intern",
-    dates: "Apr – Present",
+    dates: "Apr – Aug",
     note: "Built an LLM-as-judge harness that benchmarks autonomous coding agents against human-merged pull requests.",
   },
   {
