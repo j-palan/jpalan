@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { measureTrack, type TrackGeometry } from "@/lib/racetrackGeometry";
+import { blueRacingLine, purpleOvertake } from "@/lib/racingOvertake";
 
 // Both visible sections run in race order; the connecting straights are off-screen.
 const LOWER_TRACK = "M-180 540C100 560 330 670 280 810C250 900 160 990 100 1100";
@@ -12,7 +13,7 @@ const CARS = [
   { color: "#e7c96c", delay: 0, upperDelay: 0, lane: -8, raceLane: 0 },
   { color: "#df7065", delay: 0.42, upperDelay: 0.42, lane: 8, raceLane: 0 },
   { color: "#9dcce2", delay: 0.9, upperDelay: 0.9, lane: -8, raceLane: 0 },
-  { color: "#d2b3e7", delay: 1.38, upperDelay: 1.38, lane: 8, raceLane: 0 },
+  { color: "#d2b3e7", delay: 1.38, upperDelay: 1.08, lane: 8, raceLane: 0 },
   { color: "#f1eee1", delay: 1.96, upperDelay: 1.96, lane: -8, raceLane: -18 },
   { color: "#edaa6a", delay: 2.5, upperDelay: 2.08, lane: 8, raceLane: 18 },
 ];
@@ -213,17 +214,43 @@ export const RacetrackBackdrop = ({ active }: { active: boolean }) => {
         if (!visible) return;
         const geometry = onLower ? lowerGeometry : upperGeometry;
         const pace = onLower ? lowerPace : upperPace;
-        const progress = onLower ? lapTime / 4 : (upperTime - 6) / 4.5;
+        const baseProgress = onLower ? lapTime / 4 : (upperTime - 6) / 4.5;
+        const racingLine = !onLower && (index === 2 || index === 3)
+          ? (index === 2 ? blueRacingLine : purpleOvertake) : null;
+        const pass = racingLine?.(baseProgress);
+        const progress = pass?.progress ?? baseProgress;
+        if (progress >= 1) {
+          element?.setAttribute("visibility", "hidden");
+          return;
+        }
         const distance = pace.distanceAt(progress);
         const { pointAt } = geometry;
         const point = pointAt(distance);
         const ahead = pointAt(distance + 5);
         const behind = pointAt(distance - 5);
         const angle = Math.atan2(ahead.y - behind.y, ahead.x - behind.x);
-        const lane = onLower ? car.lane : car.raceLane;
+        const lane = onLower ? car.lane : (pass?.lane ?? car.raceLane);
         const laneX = -Math.sin(angle) * lane;
         const laneY = Math.cos(angle) * lane;
-        carsRef.current[index]?.setAttribute("transform", `translate(${point.x + laneX} ${point.y + laneY}) rotate(${angle * 180 / Math.PI})`);
+        let heading = angle;
+        if (racingLine) {
+          // Steer along the car's actual offset trajectory, including lane
+          // changes, rather than sliding sideways while facing the centreline.
+          const positionAt = (time: number) => {
+            const state = racingLine(Math.max(0, Math.min(1, time)));
+            const d = pace.distanceAt(state.progress);
+            const p = pointAt(d);
+            const a = pointAt(d + 5);
+            const b = pointAt(d - 5);
+            const tangent = Math.atan2(a.y - b.y, a.x - b.x);
+            return { x: p.x - Math.sin(tangent) * state.lane,
+              y: p.y + Math.cos(tangent) * state.lane };
+          };
+          const from = positionAt(baseProgress - 0.001);
+          const to = positionAt(baseProgress + 0.001);
+          heading = Math.atan2(to.y - from.y, to.x - from.x);
+        }
+        carsRef.current[index]?.setAttribute("transform", `translate(${point.x + laneX} ${point.y + laneY}) rotate(${heading * 180 / Math.PI})`);
         const beforeAngle = Math.atan2(point.y - behind.y, point.x - behind.x);
         const afterAngle = Math.atan2(ahead.y - point.y, ahead.x - point.x);
         const turn = Math.atan2(Math.sin(afterAngle - beforeAngle), Math.cos(afterAngle - beforeAngle));
