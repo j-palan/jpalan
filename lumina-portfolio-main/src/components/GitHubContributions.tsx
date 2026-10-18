@@ -3,6 +3,7 @@ import { useShotHit, useShotTarget } from "@/components/shot/shotContext";
 import { buildCalendar, type Contribution } from "@/lib/githubCalendar";
 
 type ContributionsResponse = {
+  total?: { lastYear?: number };
   contributions: Contribution[];
 };
 
@@ -61,6 +62,7 @@ const ContributionDay = ({ day }: { day: Contribution }) => {
 
 export const GitHubContributions = ({ username, href }: GitHubContributionsProps) => {
   const [contributions, setContributions] = useState<Contribution[] | null>(null);
+  const [reportedTotal, setReportedTotal] = useState<number | null>(null);
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
@@ -76,6 +78,11 @@ export const GitHubContributions = ({ username, href }: GitHubContributionsProps
       .then((data) => {
         if (!Array.isArray(data.contributions)) throw new Error("Invalid GitHub activity data");
         setContributions(data.contributions.filter(isContribution));
+        // GitHub's headline total can differ from the sum of its daily cells.
+        const total = data.total?.lastYear;
+        setReportedTotal(
+          typeof total === "number" && Number.isInteger(total) && total >= 0 ? total : null,
+        );
       })
       .catch((error: unknown) => {
         if (error instanceof DOMException && error.name === "AbortError") return;
@@ -89,7 +96,7 @@ export const GitHubContributions = ({ username, href }: GitHubContributionsProps
     () => (contributions ? buildCalendar(contributions) : Array<null>(PLACEHOLDER_DAYS).fill(null)),
     [contributions],
   );
-  const total = contributions?.reduce((sum, day) => sum + day.count, 0);
+  const total = reportedTotal ?? contributions?.reduce((sum, day) => sum + day.count, 0);
 
   return (
     <a
