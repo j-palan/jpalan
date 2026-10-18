@@ -108,7 +108,7 @@ export const GitHubContributions = ({ username, href }: GitHubContributionsProps
               ? "Loading GitHub contribution chart"
               : `${total} GitHub contributions in the last year`
         }
-        className={`github-calendar-grid ${contributions || failed ? "" : "animate-pulse"}`}
+        className={`github-calendar-grid ${contributions ? "github-calendar-reveal" : failed ? "" : "animate-pulse"}`}
       >
         {calendar.map((day, index) =>
           day ? (

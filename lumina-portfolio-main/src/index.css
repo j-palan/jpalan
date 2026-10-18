@@ -260,6 +260,25 @@
   /* A native contribution calendar keeps the live data independent from its
      presentation. It fills the available width while preserving square days,
      and flows down each Sunday-first week before starting the next column. */
+  @keyframes github-reveal {
+    from { mask-position: 100% 0; }
+    to { mask-position: 0 0; }
+  }
+
+  .github-calendar-reveal {
+    mask-image: linear-gradient(to right, #000 33.333%, transparent 66.667%);
+    mask-size: 300% 100%;
+    mask-repeat: no-repeat;
+    animation: github-reveal 1.2s ease-out both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .github-calendar-reveal {
+      animation: none;
+      mask-image: none;
+    }
+  }
+
   .github-calendar-grid {
     display: grid;
     grid-auto-flow: column;
