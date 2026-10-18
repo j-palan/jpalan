@@ -4,16 +4,16 @@ import { blueRacingLine, purpleOvertake } from "@/lib/racingOvertake";
 describe("purple's upper-road overtake", () => {
   it("starts in line and pulls out before accelerating", () => {
     expect(purpleOvertake(0)).toEqual(blueRacingLine(0));
-    expect(purpleOvertake(0.5)).toEqual(blueRacingLine(0.5));
-    expect(purpleOvertake(0.57).progress).toBe(0.57);
+    expect(purpleOvertake(0.36)).toEqual(blueRacingLine(0.36));
+    expect(purpleOvertake(0.43).progress).toBe(0.43);
   });
 
   it("clears blue on a separate line, without catching red", () => {
-    const baseProgress = 0.87;
+    const baseProgress = 0.94;
     const pass = purpleOvertake(baseProgress);
     const blueProgress = baseProgress + (1.08 - 0.9) / 4.5;
     const redProgress = baseProgress + (1.08 - 0.42) / 4.5;
-    expect(pass.progress - blueProgress).toBeGreaterThan(0.05);
+    expect(pass.progress - blueProgress).toBeGreaterThan(0.03);
     expect(pass.progress).toBeLessThan(redProgress);
     expect(pass.lane - blueRacingLine(blueProgress).lane).toBe(30);
   });
@@ -38,7 +38,15 @@ describe("purple's upper-road overtake", () => {
         expect(purple.lane - blue.lane).toBeGreaterThan(24);
       }
       const rate = (purpleOvertake(t + 0.0001).progress - purple.progress) / 0.0001;
-      expect(rate).toBeLessThan(1.52);
+      expect(rate).toBeLessThanOrEqual(1.18001);
     }
+  });
+
+  it("holds its exit pace instead of boosting then slowing down", () => {
+    const rateAt = (t: number) =>
+      (purpleOvertake(t + 0.0001).progress - purpleOvertake(t).progress) / 0.0001;
+    expect(rateAt(0.5)).toBeLessThan(rateAt(0.6));
+    expect(rateAt(0.7)).toBeCloseTo(1.18, 5);
+    expect(rateAt(0.9)).toBeCloseTo(rateAt(0.7), 5);
   });
 });

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { measureTrack, type TrackGeometry } from "@/lib/racetrackGeometry";
 import { blueRacingLine, purpleOvertake } from "@/lib/racingOvertake";
+import { buildRacingTrajectory } from "@/lib/racingTrajectory";
 
 // Both visible sections run in race order; the connecting straights are off-screen.
 const LOWER_TRACK = "M-180 540C100 560 330 670 280 810C250 900 160 990 100 1100";
@@ -192,6 +193,18 @@ export const RacetrackBackdrop = ({ active }: { active: boolean }) => {
     const lowerPace = buildPace(lowerGeometry, 1.2);
     // Carry full speed through the wide upper sweep without braking.
     const upperPace = buildPace(upperGeometry, 0, 0.35, 0);
+    const trajectories = [blueRacingLine, purpleOvertake].map((line) =>
+      buildRacingTrajectory((time) => {
+        const state = line(time);
+        const distance = upperPace.distanceAt(state.progress);
+        const point = upperGeometry.pointAt(distance);
+        const ahead = upperGeometry.pointAt(distance + 12);
+        const behind = upperGeometry.pointAt(distance - 12);
+        const angle = Math.atan2(ahead.y - behind.y, ahead.x - behind.x);
+        return { x: point.x - Math.sin(angle) * state.lane,
+          y: point.y + Math.cos(angle) * state.lane };
+      }),
+    );
     let frame = 0;
     let elapsed = 0;
     let previous = 0;
@@ -232,25 +245,9 @@ export const RacetrackBackdrop = ({ active }: { active: boolean }) => {
         const lane = onLower ? car.lane : (pass?.lane ?? car.raceLane);
         const laneX = -Math.sin(angle) * lane;
         const laneY = Math.cos(angle) * lane;
-        let heading = angle;
-        if (racingLine) {
-          // Steer along the car's actual offset trajectory, including lane
-          // changes, rather than sliding sideways while facing the centreline.
-          const positionAt = (time: number) => {
-            const state = racingLine(Math.max(0, Math.min(1, time)));
-            const d = pace.distanceAt(state.progress);
-            const p = pointAt(d);
-            const a = pointAt(d + 5);
-            const b = pointAt(d - 5);
-            const tangent = Math.atan2(a.y - b.y, a.x - b.x);
-            return { x: p.x - Math.sin(tangent) * state.lane,
-              y: p.y + Math.cos(tangent) * state.lane };
-          };
-          const from = positionAt(baseProgress - 0.001);
-          const to = positionAt(baseProgress + 0.001);
-          heading = Math.atan2(to.y - from.y, to.x - from.x);
-        }
-        carsRef.current[index]?.setAttribute("transform", `translate(${point.x + laneX} ${point.y + laneY}) rotate(${heading * 180 / Math.PI})`);
+        const pose = racingLine ? trajectories[index - 2](baseProgress)
+          : { x: point.x + laneX, y: point.y + laneY, heading: angle };
+        carsRef.current[index]?.setAttribute("transform", `translate(${pose.x} ${pose.y}) rotate(${pose.heading * 180 / Math.PI})`);
         const beforeAngle = Math.atan2(point.y - behind.y, point.x - behind.x);
         const afterAngle = Math.atan2(ahead.y - point.y, ahead.x - point.x);
         const turn = Math.atan2(Math.sin(afterAngle - beforeAngle), Math.cos(afterAngle - beforeAngle));
