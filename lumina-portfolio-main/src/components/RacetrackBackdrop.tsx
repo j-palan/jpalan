@@ -12,6 +12,9 @@ const LOWER_TRACK = "M-180 540C100 560 330 670 280 810C250 900 160 990 100 1100"
 const UPPER_TRACK = "M1800 690L1650 690C1410 690 1270 580 1270 420C1270 260 1460 200 1460 40L1460-160";
 // Four seconds on the lower bend, two away, 4.5 on the upper sweep, four away.
 const LAP_SECONDS = 14.5;
+const START_LIGHT_DELAY = 0.85;
+const START_LIGHT_INTERVAL = 0.4;
+const LIGHTS_OUT_SECONDS = START_LIGHT_DELAY + 5 * START_LIGHT_INTERVAL + 0.6;
 const CARS = [
   { color: "#e7c96c", delay: 0, upperDelay: 0, lane: -8, raceLane: 0 },
   { color: "#df7065", delay: 0.42, upperDelay: 0.42, lane: 8, raceLane: 0 },
@@ -173,6 +176,7 @@ const drawKerbs = (geometry: TrackGeometry, group: SVGGElement, sensitivity = 1)
 
 export const RacetrackBackdrop = ({ active }: { active: boolean }) => {
   const svgRef = useRef<SVGSVGElement>(null);
+  const startLightsRef = useRef<HTMLDivElement>(null);
   const timingRef = useRef<HTMLDivElement>(null);
   const timingCarRef = useRef<HTMLSpanElement>(null);
   const timingGapRef = useRef<HTMLSpanElement>(null);
@@ -214,6 +218,11 @@ export const RacetrackBackdrop = ({ active }: { active: boolean }) => {
     );
     let frame = 0;
     let elapsed = 0;
+    let startElapsed = 0;
+    let previousLightCount = -1;
+    let startComplete = false;
+    startLightsRef.current?.setAttribute("data-complete", "false");
+    startLightsRef.current?.setAttribute("data-count", "0");
     let previous = 0;
     let lastMark = 0;
     let lastTiming = -1;
@@ -262,7 +271,23 @@ export const RacetrackBackdrop = ({ active }: { active: boolean }) => {
     const tick = (now: number) => {
       const delta = previous ? Math.min((now - previous) / 1000, 0.05) : 0;
       previous = now;
-      if (!document.hidden && !reducedMotion.matches) elapsed += delta;
+      if (!document.hidden && !reducedMotion.matches) {
+        startElapsed += delta;
+        // The lights and the cars share one clock, including tab suspension.
+        elapsed += Math.max(0, Math.min(delta, startElapsed - LIGHTS_OUT_SECONDS));
+      }
+      if (!startComplete) {
+        const count = startElapsed >= LIGHTS_OUT_SECONDS ? 0
+          : Math.max(0, Math.min(5, Math.floor((startElapsed - START_LIGHT_DELAY) / START_LIGHT_INTERVAL)));
+        if (count !== previousLightCount) {
+          startLightsRef.current?.setAttribute("data-count", String(count));
+          previousLightCount = count;
+        }
+        if (startElapsed >= LIGHTS_OUT_SECONDS + 0.35) {
+          startLightsRef.current?.setAttribute("data-complete", "true");
+          startComplete = true;
+        }
+      }
       const drawMarks = elapsed - lastMark > 0.08 && !reducedMotion.matches;
       CARS.forEach((car, index) => {
         const lapTime = ((elapsed - car.delay) % LAP_SECONDS + LAP_SECONDS) % LAP_SECONDS;
@@ -414,6 +439,11 @@ export const RacetrackBackdrop = ({ active }: { active: boolean }) => {
 
   return (
     <>
+    {active && (
+      <div ref={startLightsRef} className="race-start-lights" data-count="0" data-complete="false" aria-hidden="true">
+        {Array.from({ length: 5 }, (_, index) => <span key={index} />)}
+      </div>
+    )}
     {createPortal(
       <div ref={timingRef} id="race-live-timing" role="tooltip" aria-hidden="true" className="race-live-timing" data-visible="false">
         <div className="race-live-timing-heading"><span className="race-live-timing-dot" /><span ref={timingCarRef}>CAR 01</span><span className="race-live-timing-live">LIVE</span></div>
