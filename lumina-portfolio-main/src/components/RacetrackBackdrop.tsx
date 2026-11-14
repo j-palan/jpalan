@@ -423,6 +423,13 @@ export const RacetrackBackdrop = ({ active }: { active: boolean }) => {
     )}
     <svg ref={svgRef} role="group" aria-label="Background race. Focus a car to view live timing." className="race-backdrop" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
       <defs>
+        {/* A small pool of warm reflected light, without blur filters or an
+            additional animation loop. It inherits each car's exact motion. */}
+        <radialGradient id="race-track-light" cx="58%" cy="50%" r="50%">
+          <stop offset="0" stopColor="hsl(var(--foreground))" stopOpacity="0.18" />
+          <stop offset="0.45" stopColor="hsl(var(--foreground))" stopOpacity="0.07" />
+          <stop offset="1" stopColor="hsl(var(--foreground))" stopOpacity="0" />
+        </radialGradient>
         <path id="race-lower" ref={lowerRef} d={LOWER_TRACK} />
         <path id="race-upper" ref={upperRef} d={UPPER_TRACK} />
         <g id="race-circuit">
@@ -439,6 +446,7 @@ export const RacetrackBackdrop = ({ active }: { active: boolean }) => {
           role="img" aria-label={`Race car ${index + 1}`} aria-describedby="race-live-timing" tabIndex={-1}
           onFocus={() => { focusedCarRef.current = index; }}
           onBlur={() => { focusedCarRef.current = null; }}>
+          <ellipse aria-hidden="true" cx="4" cy="0" rx="35" ry="21" fill="url(#race-track-light)" stroke="none" />
           {/* Nose points along +X to match the path tangent. */}
           <g className="race-car-tires">
             <rect x="5" y="-9" width="7" height="4" rx="1" />
