@@ -1,7 +1,9 @@
 import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { measureTrack, type TrackGeometry } from "@/lib/racetrackGeometry";
 import { blueRacingLine, purpleOvertake } from "@/lib/racingOvertake";
 import { buildRacingTrajectory } from "@/lib/racingTrajectory";
+import { gapAhead } from "@/lib/raceTiming";
 
 // Both visible sections run in race order; the connecting straights are off-screen.
 const LOWER_TRACK = "M-180 540C100 560 330 670 280 810C250 900 160 990 100 1100";
@@ -170,6 +172,11 @@ const drawKerbs = (geometry: TrackGeometry, group: SVGGElement, sensitivity = 1)
 };
 
 export const RacetrackBackdrop = ({ active }: { active: boolean }) => {
+  const svgRef = useRef<SVGSVGElement>(null);
+  const timingRef = useRef<HTMLDivElement>(null);
+  const timingCarRef = useRef<HTMLSpanElement>(null);
+  const timingGapRef = useRef<HTMLSpanElement>(null);
+  const focusedCarRef = useRef<number | null>(null);
   const lowerRef = useRef<SVGPathElement>(null);
   const upperRef = useRef<SVGPathElement>(null);
   const carsRef = useRef<(SVGGElement | null)[]>([]);
@@ -209,6 +216,47 @@ export const RacetrackBackdrop = ({ active }: { active: boolean }) => {
     let elapsed = 0;
     let previous = 0;
     let lastMark = 0;
+    let lastTiming = -1;
+    let selected = -1;
+    let candidate = -1;
+    let candidateSince = 0;
+    let lastSeen = 0;
+    let tooltipPosition: { x: number; y: number } | null = null;
+    let dismissed = false;
+    let pointer: { x: number; y: number } | null = null;
+    let viewport = { width: window.innerWidth, height: window.innerHeight };
+    let screenMatrix = svgRef.current?.getScreenCTM();
+    const positions: ({ x: number; y: number } | null)[] = CARS.map(() => null);
+    const phases = CARS.map(() => 0);
+    const hideTiming = () => {
+      timingRef.current?.setAttribute("data-visible", "false");
+      timingRef.current?.setAttribute("aria-hidden", "true");
+      if (selected >= 0) carsRef.current[selected]?.removeAttribute("data-timing-active");
+      selected = -1;
+      tooltipPosition = null;
+    };
+    const movePointer = (event: PointerEvent) => {
+      if (event.pointerType === "touch") return;
+      // Never interfere with the page's links, coin, or other controls.
+      const target = event.target as Element | null;
+      pointer = target?.closest("a, button, input, textarea, select, [role='button']")
+        ? null : { x: event.clientX, y: event.clientY };
+      dismissed = false;
+    };
+    const leavePointer = () => { pointer = null; };
+    const dismissTiming = (event: KeyboardEvent) => {
+      if (event.key === "Escape") { dismissed = true; hideTiming(); }
+    };
+    const resize = () => {
+      viewport = { width: window.innerWidth, height: window.innerHeight };
+      screenMatrix = svgRef.current?.getScreenCTM();
+      hideTiming();
+    };
+    window.addEventListener("pointermove", movePointer, { passive: true });
+    window.addEventListener("resize", resize, { passive: true });
+    window.addEventListener("keydown", dismissTiming);
+    window.addEventListener("blur", leavePointer);
+    document.addEventListener("pointerleave", leavePointer);
     const marks: { element: SVGLineElement; created: number }[] = [];
 
     const tick = (now: number) => {
@@ -221,6 +269,12 @@ export const RacetrackBackdrop = ({ active }: { active: boolean }) => {
         // The last two cars pull alongside one another off-screen.
         const upperTime = ((elapsed - car.upperDelay) % LAP_SECONDS + LAP_SECONDS) % LAP_SECONDS;
         const onLower = lapTime < 4;
+        phases[index] = lapTime < 6 ? lapTime : upperTime;
+        if (upperTime >= 6 && upperTime < 10.5 && !onLower) {
+          const time = (upperTime - 6) / 4.5;
+          phases[index] = 6 + 4.5 * (index === 3 ? purpleOvertake(time).progress : time);
+        }
+        positions[index] = null;
         const visible = onLower || (upperTime >= 6 && upperTime < 10.5);
         const element = carsRef.current[index];
         element?.setAttribute("visibility", visible ? "visible" : "hidden");
@@ -247,6 +301,14 @@ export const RacetrackBackdrop = ({ active }: { active: boolean }) => {
         const laneY = Math.cos(angle) * lane;
         const pose = racingLine ? trajectories[index - 2](baseProgress)
           : { x: point.x + laneX, y: point.y + laneY, heading: angle };
+        if (screenMatrix) {
+          const x = screenMatrix.a * pose.x + screenMatrix.c * pose.y + screenMatrix.e;
+          const y = screenMatrix.b * pose.x + screenMatrix.d * pose.y + screenMatrix.f;
+          if (x > 0 && x < viewport.width && y > 0 && y < viewport.height) {
+            positions[index] = { x, y };
+          }
+        }
+        element?.setAttribute("tabindex", positions[index] ? "0" : "-1");
         carsRef.current[index]?.setAttribute("transform", `translate(${pose.x} ${pose.y}) rotate(${pose.heading * 180 / Math.PI})`);
         const beforeAngle = Math.atan2(point.y - behind.y, point.x - behind.x);
         const afterAngle = Math.atan2(ahead.y - point.y, ahead.x - point.x);
@@ -268,6 +330,59 @@ export const RacetrackBackdrop = ({ active }: { active: boolean }) => {
           }
         }
       });
+      // Reuse the race's existing frame loop. Only update text ten times a
+      // second while inspecting a car; no React renders or layout reads.
+      if (elapsed - lastTiming >= 0.1) {
+        lastTiming = elapsed;
+        let hovered = focusedCarRef.current ?? -1;
+        if (hovered < 0 && pointer) {
+          let nearest = 34;
+          positions.forEach((position, index) => {
+            if (!position) return;
+            const distance = Math.hypot(position.x - pointer.x, position.y - pointer.y);
+            if (distance < nearest) { nearest = distance; hovered = index; }
+          });
+        }
+        // Once selected, follow the car rather than requiring the user to
+        // chase it. A brief dwell prevents passing cars from stealing focus.
+        if (hovered !== candidate) { candidate = hovered; candidateSince = elapsed; }
+        if (hovered >= 0 && positions[hovered] && !dismissed &&
+          (selected < 0 || focusedCarRef.current !== null || elapsed - candidateSince >= 0.18)) {
+          if (selected !== hovered) {
+            hideTiming();
+            selected = hovered;
+            carsRef.current[hovered]?.setAttribute("data-timing-active", "true");
+          }
+          lastSeen = elapsed;
+        }
+        if (selected >= 0 && positions[selected]) lastSeen = elapsed;
+        if (dismissed || reducedMotion.matches || (selected >= 0 && elapsed - lastSeen > 1)) hideTiming();
+        if (selected >= 0) {
+          const { ahead, seconds } = gapAhead(phases, selected, LAP_SECONDS);
+          const tooltip = timingRef.current;
+          if (tooltip && timingCarRef.current && timingGapRef.current) {
+            tooltip.style.setProperty("--timing-color", CARS[selected].color);
+            timingCarRef.current.textContent = `CAR ${String(selected + 1).padStart(2, "0")}`;
+            timingGapRef.current.textContent = `+${seconds.toFixed(2)}s to #${String(ahead + 1).padStart(2, "0")}`;
+            tooltip.setAttribute("data-visible", "true");
+            tooltip.setAttribute("aria-hidden", "false");
+          }
+        }
+      }
+      // Follow at the animation's full frame rate, independently of the 10Hz
+      // timing text. Frame-rate-independent easing removes visible stepping.
+      const trackedPosition = positions[selected];
+      if (selected >= 0 && trackedPosition && timingRef.current) {
+        const target = {
+          x: Math.max(12, Math.min(viewport.width - 188, trackedPosition.x + 25)),
+          y: Math.max(12, Math.min(viewport.height - 92, trackedPosition.y - 88)),
+        };
+        if (!tooltipPosition) tooltipPosition = target;
+        const blend = 1 - Math.exp(-16 * delta);
+        tooltipPosition.x += (target.x - tooltipPosition.x) * blend;
+        tooltipPosition.y += (target.y - tooltipPosition.y) * blend;
+        timingRef.current.style.transform = `translate3d(${tooltipPosition.x}px, ${tooltipPosition.y}px, 0)`;
+      }
       if (drawMarks) lastMark = elapsed;
       while (marks.length && elapsed - marks[0].created > 3.5) marks.shift()?.element.remove();
       for (const mark of marks) mark.element.setAttribute("opacity", String(0.45 * (1 - (elapsed - mark.created) / 3.5)));
@@ -275,6 +390,7 @@ export const RacetrackBackdrop = ({ active }: { active: boolean }) => {
     };
     const syncPlayback = () => {
       cancelAnimationFrame(frame);
+      hideTiming();
       previous = 0;
       if (!document.hidden && !reducedMotion.matches) frame = requestAnimationFrame(tick);
     };
@@ -285,13 +401,27 @@ export const RacetrackBackdrop = ({ active }: { active: boolean }) => {
       cancelAnimationFrame(frame);
       document.removeEventListener("visibilitychange", syncPlayback);
       reducedMotion.removeEventListener("change", syncPlayback);
+      window.removeEventListener("pointermove", movePointer);
+      window.removeEventListener("resize", resize);
+      window.removeEventListener("keydown", dismissTiming);
+      window.removeEventListener("blur", leavePointer);
+      document.removeEventListener("pointerleave", leavePointer);
+      hideTiming();
       skids.replaceChildren();
       kerbs.replaceChildren();
     };
   }, [active]);
 
   return (
-    <svg aria-hidden="true" className="race-backdrop" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+    <>
+    {createPortal(
+      <div ref={timingRef} id="race-live-timing" role="tooltip" aria-hidden="true" className="race-live-timing" data-visible="false">
+        <div className="race-live-timing-heading"><span className="race-live-timing-dot" /><span ref={timingCarRef}>CAR 01</span><span className="race-live-timing-live">LIVE</span></div>
+        <span className="race-live-timing-label">GAP AHEAD</span>
+        <span ref={timingGapRef} className="race-live-timing-gap" />
+      </div>, document.body,
+    )}
+    <svg ref={svgRef} role="group" aria-label="Background race. Focus a car to view live timing." className="race-backdrop" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
       <defs>
         <path id="race-lower" ref={lowerRef} d={LOWER_TRACK} />
         <path id="race-upper" ref={upperRef} d={UPPER_TRACK} />
@@ -305,7 +435,10 @@ export const RacetrackBackdrop = ({ active }: { active: boolean }) => {
       <g ref={kerbsRef} />
       <g ref={skidsRef} className="race-skids" />
       {CARS.map((car, index) => (
-        <g key={car.color} ref={(element) => { carsRef.current[index] = element; }} className="race-car" visibility="hidden" style={{ color: car.color }}>
+        <g key={car.color} ref={(element) => { carsRef.current[index] = element; }} className="race-car" visibility="hidden" style={{ color: car.color }}
+          role="img" aria-label={`Race car ${index + 1}`} aria-describedby="race-live-timing" tabIndex={-1}
+          onFocus={() => { focusedCarRef.current = index; }}
+          onBlur={() => { focusedCarRef.current = null; }}>
           {/* Nose points along +X to match the path tangent. */}
           <g className="race-car-tires">
             <rect x="5" y="-9" width="7" height="4" rx="1" />
@@ -323,5 +456,6 @@ export const RacetrackBackdrop = ({ active }: { active: boolean }) => {
         </g>
       ))}
     </svg>
+    </>
   );
 };

@@ -217,6 +217,45 @@
     opacity: 0.9;
   }
 
+  .race-car[data-timing-active="true"] {
+    opacity: 1;
+    stroke: hsl(var(--foreground) / 0.7);
+    stroke-width: 0.5;
+  }
+
+  .race-car:focus-visible {
+    outline: 2px solid hsl(var(--foreground));
+    outline-offset: 5px;
+  }
+
+  .race-live-timing {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 40;
+    width: 176px;
+    padding: 11px 13px;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    border: 1px solid hsl(var(--foreground) / 0.18);
+    border-left: 2px solid var(--timing-color, hsl(var(--foreground)));
+    border-radius: 3px;
+    background: hsl(var(--background) / 0.97);
+    color: hsl(var(--foreground));
+    font-family: var(--font-mono, monospace);
+    font-variant-numeric: tabular-nums;
+    box-shadow: 0 8px 24px hsl(164 60% 5% / 0.18);
+    transition: opacity 220ms ease, visibility 220ms ease;
+  }
+
+  .race-live-timing[data-visible="true"] { opacity: 1; visibility: visible; }
+  .race-live-timing-heading { display: flex; align-items: center; gap: 6px; font-size: 10px; letter-spacing: 0.08em; }
+  .race-live-timing-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--timing-color); }
+  .race-live-timing-live { margin-left: auto; font-size: 8px; color: hsl(var(--faint)); }
+  .race-live-timing-label { display: block; margin-top: 9px; font-size: 8px; letter-spacing: 0.12em; color: hsl(var(--faint)); }
+  .race-live-timing-gap { display: block; margin-top: 3px; font-size: 12px; }
+
   .race-car-tires {
     fill: hsl(164 35% 7%);
   }
