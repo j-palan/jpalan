@@ -185,6 +185,7 @@ export const RacetrackBackdrop = ({ active }: { active: boolean }) => {
   const lowerRef = useRef<SVGPathElement>(null);
   const upperRef = useRef<SVGPathElement>(null);
   const carsRef = useRef<(SVGGElement | null)[]>([]);
+  const brakeLightsRef = useRef<(SVGGElement | null)[]>([]);
   const skidsRef = useRef<SVGGElement>(null);
   const kerbsRef = useRef<SVGGElement>(null);
 
@@ -227,6 +228,10 @@ export const RacetrackBackdrop = ({ active }: { active: boolean }) => {
     let previous = 0;
     let lastMark = 0;
     let lastTiming = -1;
+    const braking = CARS.map(() => ({
+      previous: null as { x: number; y: number } | null,
+      section: "", speed: 0, deceleration: 0, glow: 0,
+    }));
     let selected = -1;
     let candidate = -1;
     let candidateSince = 0;
@@ -314,7 +319,12 @@ export const RacetrackBackdrop = ({ active }: { active: boolean }) => {
         const visible = onLower || (upperTime >= 6 && upperTime < 10.5);
         const element = carsRef.current[index];
         element?.setAttribute("visibility", visible ? "visible" : "hidden");
-        if (!visible) return;
+        if (!visible) {
+          braking[index].previous = null;
+          braking[index].glow = 0;
+          brakeLightsRef.current[index]?.setAttribute("opacity", "0");
+          return;
+        }
         const geometry = onLower ? lowerGeometry : upperGeometry;
         const pace = onLower ? lowerPace : upperPace;
         const baseProgress = onLower ? lapTime / 4 : (upperTime - 6) / 4.5;
@@ -335,6 +345,27 @@ export const RacetrackBackdrop = ({ active }: { active: boolean }) => {
         const laneY = Math.cos(angle) * lane;
         const pose = racingLine ? trajectories[index === raceEvent?.defender ? 0 : 1](baseProgress)
           : { x: point.x + laneX, y: point.y + laneY, heading: angle };
+        // Track-space deceleration, not screen size or simply entering a bend.
+        // Smooth measurements and fade the glow rather than flickering it.
+        const brake = braking[index];
+        const section = onLower ? "lower" : "upper";
+        if (brake.previous && brake.section === section && delta > 0) {
+          const measured = Math.hypot(pose.x - brake.previous.x, pose.y - brake.previous.y) / delta;
+          const speed = brake.speed + (measured - brake.speed) * (1 - Math.exp(-delta / 0.1));
+          brake.deceleration += ((brake.speed - speed) / delta - brake.deceleration)
+            * (1 - Math.exp(-delta / 0.08));
+          brake.speed = speed;
+          const intensity = Math.max(0, Math.min(1, (brake.deceleration - 18) / 160));
+          brake.glow += (intensity - brake.glow)
+            * (1 - Math.exp(-delta / (intensity > brake.glow ? 0.055 : 0.2)));
+        } else {
+          brake.speed = 0;
+          brake.deceleration = 0;
+          brake.glow = 0;
+        }
+        brake.previous = pose;
+        brake.section = section;
+        brakeLightsRef.current[index]?.setAttribute("opacity", brake.glow.toFixed(3));
         if (screenMatrix) {
           const x = screenMatrix.a * pose.x + screenMatrix.c * pose.y + screenMatrix.e;
           const y = screenMatrix.b * pose.x + screenMatrix.d * pose.y + screenMatrix.f;
@@ -426,6 +457,7 @@ export const RacetrackBackdrop = ({ active }: { active: boolean }) => {
       cancelAnimationFrame(frame);
       hideTiming();
       previous = 0;
+      braking.forEach((brake) => { brake.previous = null; });
       if (!document.hidden && !reducedMotion.matches) frame = requestAnimationFrame(tick);
     };
     document.addEventListener("visibilitychange", syncPlayback);
@@ -462,6 +494,11 @@ export const RacetrackBackdrop = ({ active }: { active: boolean }) => {
     )}
     <svg ref={svgRef} role="group" aria-label="Background race. Focus a car to view live timing." className="race-backdrop" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
       <defs>
+        <radialGradient id="race-brake-glow">
+          <stop offset="0" stopColor="#ff382e" stopOpacity="0.8" />
+          <stop offset="0.4" stopColor="#f02c25" stopOpacity="0.3" />
+          <stop offset="1" stopColor="#f02c25" stopOpacity="0" />
+        </radialGradient>
         {/* A small pool of warm reflected light, without blur filters or an
             additional animation loop. It inherits each car's exact motion. */}
         <radialGradient id="race-track-light" cx="58%" cy="50%" r="50%">
@@ -500,6 +537,11 @@ export const RacetrackBackdrop = ({ active }: { active: boolean }) => {
           </g>
           <ellipse className="race-car-cockpit" cx="-2" cy="0" rx="3.5" ry="2" />
           <path d="M-4 0H2" stroke="#fff8e7" strokeOpacity="0.55" strokeWidth="0.8" />
+          <g ref={(element) => { brakeLightsRef.current[index] = element; }} opacity="0" aria-hidden="true">
+            <ellipse cx="-17" cy="0" rx="12" ry="8" fill="url(#race-brake-glow)" stroke="none" />
+            <rect x="-16" y="-2" width="2.5" height="4" rx="0.7" fill="#ff5146" stroke="none" />
+            <rect x="-16" y="-1" width="1" height="2" rx="0.4" fill="#ffb0a0" stroke="none" />
+          </g>
         </g>
       ))}
     </svg>
