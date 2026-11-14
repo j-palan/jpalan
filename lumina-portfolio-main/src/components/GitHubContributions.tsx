@@ -9,10 +9,10 @@ type ContributionsResponse = {
 };
 
 const LEVEL_STYLES = [
-  "bg-foreground/10",
-  "bg-foreground/25",
-  "bg-foreground/45",
-  "bg-foreground/70",
+  "bg-foreground/[0.08]",
+  "bg-foreground/35",
+  "bg-foreground/55",
+  "bg-foreground/75",
   "bg-foreground",
 ] as const;
 
