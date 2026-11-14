@@ -4,6 +4,7 @@ import { measureTrack, type TrackGeometry } from "@/lib/racetrackGeometry";
 import { blueRacingLine, purpleOvertake } from "@/lib/racingOvertake";
 import { buildRacingTrajectory } from "@/lib/racingTrajectory";
 import { gapAhead } from "@/lib/raceTiming";
+import { getRaceEvent } from "@/lib/raceEvents";
 
 // Both visible sections run in race order; the connecting straights are off-screen.
 const LOWER_TRACK = "M-180 540C100 560 330 670 280 810C250 900 160 990 100 1100";
@@ -289,15 +290,25 @@ export const RacetrackBackdrop = ({ active }: { active: boolean }) => {
         }
       }
       const drawMarks = elapsed - lastMark > 0.08 && !reducedMotion.matches;
+      // Pick the next battle while all cars are on the hidden connector.
+      // The complete visible upper-road sequence uses the same event.
+      const raceEvent = getRaceEvent(Math.floor((elapsed - 6) / LAP_SECONDS));
       CARS.forEach((car, index) => {
         const lapTime = ((elapsed - car.delay) % LAP_SECONDS + LAP_SECONDS) % LAP_SECONDS;
-        // The last two cars pull alongside one another off-screen.
-        const upperTime = ((elapsed - car.upperDelay) % LAP_SECONDS + LAP_SECONDS) % LAP_SECONDS;
+        // Bring a battling pair close together off-screen. On quieter laps,
+        // purple returns to its usual gap; the last two keep their paired run.
+        const upperDelay = raceEvent?.attacker === index
+          ? CARS[raceEvent.defender].upperDelay + 0.18
+          : index === 3 ? car.delay : car.upperDelay;
+        const upperTime = ((elapsed - upperDelay) % LAP_SECONDS + LAP_SECONDS) % LAP_SECONDS;
         const onLower = lapTime < 4;
+        const racingLine = onLower ? null
+          : index === raceEvent?.defender ? blueRacingLine
+          : index === raceEvent?.attacker ? purpleOvertake : null;
         phases[index] = lapTime < 6 ? lapTime : upperTime;
         if (upperTime >= 6 && upperTime < 10.5 && !onLower) {
           const time = (upperTime - 6) / 4.5;
-          phases[index] = 6 + 4.5 * (index === 3 ? purpleOvertake(time).progress : time);
+          phases[index] = 6 + 4.5 * (racingLine ? racingLine(time).progress : time);
         }
         positions[index] = null;
         const visible = onLower || (upperTime >= 6 && upperTime < 10.5);
@@ -307,8 +318,6 @@ export const RacetrackBackdrop = ({ active }: { active: boolean }) => {
         const geometry = onLower ? lowerGeometry : upperGeometry;
         const pace = onLower ? lowerPace : upperPace;
         const baseProgress = onLower ? lapTime / 4 : (upperTime - 6) / 4.5;
-        const racingLine = !onLower && (index === 2 || index === 3)
-          ? (index === 2 ? blueRacingLine : purpleOvertake) : null;
         const pass = racingLine?.(baseProgress);
         const progress = pass?.progress ?? baseProgress;
         if (progress >= 1) {
@@ -324,7 +333,7 @@ export const RacetrackBackdrop = ({ active }: { active: boolean }) => {
         const lane = onLower ? car.lane : (pass?.lane ?? car.raceLane);
         const laneX = -Math.sin(angle) * lane;
         const laneY = Math.cos(angle) * lane;
-        const pose = racingLine ? trajectories[index - 2](baseProgress)
+        const pose = racingLine ? trajectories[index === raceEvent?.defender ? 0 : 1](baseProgress)
           : { x: point.x + laneX, y: point.y + laneY, heading: angle };
         if (screenMatrix) {
           const x = screenMatrix.a * pose.x + screenMatrix.c * pose.y + screenMatrix.e;
