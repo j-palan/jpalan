@@ -14,7 +14,7 @@ const UPPER_TRACK = "M1800 690L1650 690C1410 690 1270 580 1270 420C1270 260 1460
 // Four seconds on the lower bend, two away, 4.5 on the upper sweep, four away.
 const LAP_SECONDS = 14.5;
 const START_LIGHT_DELAY = 0.85;
-const START_LIGHT_INTERVAL = 0.4;
+const START_LIGHT_INTERVAL = 0.48;
 const LIGHTS_OUT_SECONDS = START_LIGHT_DELAY + 5 * START_LIGHT_INTERVAL + 0.6;
 const CARS = [
   { color: "#e7c96c", delay: 0, upperDelay: 0, lane: -8, raceLane: 0 },
@@ -175,7 +175,9 @@ const drawKerbs = (geometry: TrackGeometry, group: SVGGElement, sensitivity = 1)
   group.appendChild(fragment);
 };
 
-export const RacetrackBackdrop = ({ active }: { active: boolean }) => {
+export const RacetrackBackdrop = ({ active, onRaceStart }: { active: boolean; onRaceStart?: () => void }) => {
+  const onRaceStartRef = useRef(onRaceStart);
+  useEffect(() => { onRaceStartRef.current = onRaceStart; }, [onRaceStart]);
   const svgRef = useRef<SVGSVGElement>(null);
   const startLightsRef = useRef<HTMLDivElement>(null);
   const timingRef = useRef<HTMLDivElement>(null);
@@ -223,6 +225,7 @@ export const RacetrackBackdrop = ({ active }: { active: boolean }) => {
     let startElapsed = 0;
     let previousLightCount = -1;
     let startComplete = false;
+    let raceReleased = false;
     startLightsRef.current?.setAttribute("data-complete", "false");
     startLightsRef.current?.setAttribute("data-count", "0");
     let previous = 0;
@@ -283,6 +286,10 @@ export const RacetrackBackdrop = ({ active }: { active: boolean }) => {
         elapsed += Math.max(0, Math.min(delta, startElapsed - LIGHTS_OUT_SECONDS));
       }
       if (!startComplete) {
+        if (!raceReleased && startElapsed >= LIGHTS_OUT_SECONDS) {
+          raceReleased = true;
+          onRaceStartRef.current?.();
+        }
         const count = startElapsed >= LIGHTS_OUT_SECONDS ? 0
           : Math.max(0, Math.min(5, Math.floor((startElapsed - START_LIGHT_DELAY) / START_LIGHT_INTERVAL)));
         if (count !== previousLightCount) {
@@ -457,6 +464,10 @@ export const RacetrackBackdrop = ({ active }: { active: boolean }) => {
       cancelAnimationFrame(frame);
       hideTiming();
       previous = 0;
+      if (reducedMotion.matches && !raceReleased) {
+        raceReleased = true;
+        onRaceStartRef.current?.();
+      }
       braking.forEach((brake) => { brake.previous = null; });
       if (!document.hidden && !reducedMotion.matches) frame = requestAnimationFrame(tick);
     };

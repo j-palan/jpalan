@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useReducedMotion } from "framer-motion";
 import { useShotHit, useShotTarget } from "@/components/shot/shotContext";
 import { buildCalendar, type Contribution } from "@/lib/githubCalendar";
 
@@ -42,28 +43,36 @@ const formatDate = (date: string) =>
 type GitHubContributionsProps = {
   username: string;
   href: string;
+  raceStarted?: boolean;
 };
 
-const ContributionDay = ({ day }: { day: Contribution }) => {
+const ContributionDay = ({ day, index, revealed }: { day: Contribution | null; index: number; revealed: boolean }) => {
   const { shaking, onHit } = useShotHit();
   const ref = useShotTarget<HTMLSpanElement>({ onHit });
+  const column = Math.floor(index / 7);
+  const row = index % 7;
+  const light = (Math.floor(column / 2) + Math.floor(row / 2)) % 2 === 0;
 
   return (
     <span
       ref={ref}
       aria-hidden="true"
-      title={`${day.count} contribution${day.count === 1 ? "" : "s"} on ${formatDate(day.date)}`}
-      className={`aspect-square min-w-0 rounded-[1px] transition-colors duration-200 ${
-        LEVEL_STYLES[day.level]
+      title={day && revealed ? `${day.count} contribution${day.count === 1 ? "" : "s"} on ${formatDate(day.date)}` : undefined}
+      style={{ "--flag-color": light ? "hsl(var(--foreground) / 0.72)" : "hsl(var(--foreground) / 0.035)",
+        "--cell-delay": `${column * 9}ms` } as CSSProperties}
+      className={`github-calendar-cell aspect-square min-w-0 rounded-[1px] ${
+        day ? LEVEL_STYLES[day.level] : "bg-transparent"
       } ${shaking ? "shot-shake !bg-foreground" : ""}`}
     />
   );
 };
 
-export const GitHubContributions = ({ username, href }: GitHubContributionsProps) => {
+export const GitHubContributions = ({ username, href, raceStarted = true }: GitHubContributionsProps) => {
   const [contributions, setContributions] = useState<Contribution[] | null>(null);
   const [reportedTotal, setReportedTotal] = useState<number | null>(null);
   const [failed, setFailed] = useState(false);
+  const prefersReduced = useReducedMotion();
+  const revealed = (raceStarted || prefersReduced) && Boolean(contributions || failed);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -93,7 +102,10 @@ export const GitHubContributions = ({ username, href }: GitHubContributionsProps
   }, [username]);
 
   const calendar = useMemo(
-    () => (contributions ? buildCalendar(contributions) : Array<null>(PLACEHOLDER_DAYS).fill(null)),
+    () => {
+      const days = contributions ? buildCalendar(contributions) : [];
+      return days.length ? days : Array<null>(PLACEHOLDER_DAYS).fill(null);
+    },
     [contributions],
   );
   const total = reportedTotal ?? contributions?.reduce((sum, day) => sum + day.count, 0);
@@ -109,34 +121,30 @@ export const GitHubContributions = ({ username, href }: GitHubContributionsProps
       <span
         role="img"
         aria-label={
-          failed
+          !raceStarted && !prefersReduced
+            ? "Checkered flag. GitHub contributions appear when the starting lights go out."
+            : failed
             ? "GitHub contribution chart unavailable"
             : total === undefined
               ? "Loading GitHub contribution chart"
               : `${total} GitHub contributions in the last year`
         }
-        className={`github-calendar-grid ${contributions ? "github-calendar-reveal" : failed ? "" : "animate-pulse"}`}
+        className="github-calendar-grid"
+        data-mode={revealed ? "contributions" : "flag"}
       >
-        {calendar.map((day, index) =>
-          day ? (
-            <ContributionDay key={day.date} day={day} />
-          ) : (
-            <span
-              // Padded cells have no date, so their position is the stable key.
-              key={`empty-${index}`}
-              aria-hidden="true"
-              className={`aspect-square min-w-0 rounded-[1px] ${
-                contributions ? "bg-transparent" : "bg-foreground/10"
-              }`}
-            />
-          ),
-        )}
+        {calendar.map((day, index) => (
+          // Keep the same cells while the data arrives, so the flag morphs
+          // into the actual daily levels rather than remounting the grid.
+          <ContributionDay key={index} day={day} index={index} revealed={Boolean(revealed)} />
+        ))}
       </span>
       <span
         aria-live="polite"
-        className="mt-2 block min-h-4 font-mono text-[0.6875rem] tabular-nums text-faint"
+        className="github-calendar-caption mt-2 block min-h-4 font-mono text-[0.6875rem] tabular-nums text-faint"
+        data-visible={Boolean(raceStarted || prefersReduced)}
       >
-        {failed
+        {!raceStarted && !prefersReduced ? ""
+          : failed
           ? "Contributions unavailable"
           : total === undefined
             ? "Loading contributions…"

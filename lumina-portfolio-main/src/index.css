@@ -343,22 +343,23 @@
   /* A native contribution calendar keeps the live data independent from its
      presentation. It fills the available width while preserving square days,
      and flows down each Sunday-first week before starting the next column. */
-  @keyframes github-reveal {
-    from { mask-position: 100% 0; }
-    to { mask-position: 0 0; }
+  .github-calendar-cell {
+    transition: background-color 440ms ease;
+    transition-delay: var(--cell-delay, 0ms);
   }
 
-  .github-calendar-reveal {
-    mask-image: linear-gradient(to right, #000 33.333%, transparent 66.667%);
-    mask-size: 300% 100%;
-    mask-repeat: no-repeat;
-    animation: github-reveal 1.2s ease-out both;
+  .github-calendar-grid[data-mode="flag"] .github-calendar-cell {
+    background-color: var(--flag-color);
+    transition-delay: 0ms;
   }
+
+  .github-calendar-caption { transition: opacity 350ms ease 450ms; }
+  .github-calendar-caption[data-visible="false"] { opacity: 0; transition: none; }
 
   @media (prefers-reduced-motion: reduce) {
-    .github-calendar-reveal {
-      animation: none;
-      mask-image: none;
+    .github-calendar-cell,
+    .github-calendar-caption {
+      transition: none;
     }
   }
 

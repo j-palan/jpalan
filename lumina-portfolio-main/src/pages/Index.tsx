@@ -46,6 +46,7 @@ const Page = () => {
   const [markVisible, setMarkVisible] = useState(false);
   const [introComplete, setIntroComplete] = useState(false);
   const [detailsReady, setDetailsReady] = useState(false);
+  const [raceStarted, setRaceStarted] = useState(false);
   const prefersReduced = useReducedMotion();
 
   useEffect(() => {
@@ -97,7 +98,7 @@ const Page = () => {
         animate={{ opacity: detailsReady ? 1 : 0 }}
         transition={{ duration: prefersReduced ? 0 : 0.9, ease: EASE }}
       >
-        <RacetrackBackdrop active={introComplete && detailsReady} />
+        <RacetrackBackdrop active={introComplete && detailsReady} onRaceStart={() => setRaceStarted(true)} />
       </motion.div>
 
       <div className={revealed ? "relative z-10" : "pointer-events-none relative z-10"}>
@@ -152,7 +153,7 @@ const Page = () => {
             aria-label="GitHub contributions"
             className="flex flex-1 items-center justify-center py-14 sm:py-4"
           >
-            {detailsReady && <GitHubContributions username={github.username} href={github.href} />}
+            {detailsReady && <GitHubContributions username={github.username} href={github.href} raceStarted={raceStarted} />}
           </motion.section>
         </main>
       </div>
